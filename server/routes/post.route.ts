@@ -15,6 +15,14 @@ export const postRoute = new Elysia({ name: 'Route.Post', prefix: '/post' })
     if (!posts) return error(404, { message: 'No posts found' })
     return posts
   })
+  .post(
+    '/upload',
+    async ({ body: { file } }) => {
+      console.log(file)
+      return file
+    },
+    { body: 'uploadFile' },
+  )
 
   .guard((app) =>
     app

@@ -17,7 +17,7 @@ const RootLayout: NextPage<React.PropsWithChildren> = ({ children }) => (
     <body className={cn('font-sans', inter.variable)}>
       <Provider>
         <Header />
-        <main className="container flex-grow">{children}</main>
+        {children}
         <Toaster />
       </Provider>
     </body>
