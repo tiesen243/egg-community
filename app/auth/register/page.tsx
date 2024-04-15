@@ -6,20 +6,18 @@ import useSWRMutation from 'swr/mutation'
 
 import { Button } from '@/components/ui/button'
 import { FormField } from '@/components/ui/form-field'
-import { api } from '@/lib/api'
 import { Typography } from '@/components/ui/typography'
+import { api } from '@/lib/api'
+import { registerSchema } from '@/server/models/user.model'
 
 const Page: NextPage = () => {
   const router = useRouter()
   const { trigger, isMutating, error } = useSWRMutation<unknown, Error, string, FormData>(
     'login',
     async (_, { arg }) => {
-      const body = Object.fromEntries(arg.entries()) as {
-        name: string
-        email: string
-        password: string
-      }
-      const { data, error } = await api.user['sign-up'].post(body)
+      const inp = registerSchema.safeParse(Object.fromEntries(arg.entries()))
+      if (!inp.success) throw inp.error.flatten()
+      const { data, error } = await api.user['sign-up'].post(inp.data)
       if (error) throw error.value
       return data
     },
@@ -41,6 +39,12 @@ const Page: NextPage = () => {
         name="password"
         type="password"
         message={error?.fieldErrors?.password}
+      />
+      <FormField
+        label="Confirm Password"
+        name="confirmPassword"
+        type="password"
+        message={error?.fieldErrors?.confirmPassword}
       />
 
       <p>

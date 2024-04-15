@@ -8,14 +8,16 @@ import { Button } from '@/components/ui/button'
 import { FormField } from '@/components/ui/form-field'
 import { Typography } from '@/components/ui/typography'
 import { api } from '@/lib/api'
+import { loginSchema } from '@/server/models/user.model'
 
 const Page: NextPage = () => {
   const router = useRouter()
   const { trigger, isMutating, error } = useSWRMutation<unknown, Error, string, FormData>(
     'login',
     async (_, { arg }) => {
-      const body = Object.fromEntries(arg.entries()) as { email: string; password: string }
-      const { data, error } = await api.user['sign-in'].post(body)
+      const inp = loginSchema.safeParse(Object.fromEntries(arg.entries()))
+      if (!inp.success) throw inp.error.flatten()
+      const { data, error } = await api.user['sign-in'].post(inp.data)
       if (error) throw error.value
       return data
     },
