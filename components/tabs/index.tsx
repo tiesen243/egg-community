@@ -17,17 +17,18 @@ export const Tabs: React.FC<{ className?: string }> = ({ className }) => {
       className={cn('container flex max-w-screen-md items-center justify-between gap-2', className)}
     >
       {isNotInNav && (
-        <Button variant="ghost" className="flex-1" onClick={() => router.back()}>
+        <Button variant="ghost" className="order-1 flex-1" onClick={() => router.back()}>
           <ChevronLeft />
         </Button>
       )}
+
       <CreatePost />
 
-      {siteConfig.navs.map((nav, index) => (
+      {siteConfig.navs.map((nav, idx) => (
         <Button
-          key={index}
+          key={idx}
           variant="ghost"
-          className={`order-${nav.order} flex-1`}
+          className={`${idx + 1 === siteConfig.navs.length ? 'order-4' : 'order-2'} flex-1`}
           onClick={() => router.push(nav.href)}
         >
           <nav.label className={pathName === nav.href ? '' : 'text-muted-foreground'} />

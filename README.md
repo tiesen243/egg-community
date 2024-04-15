@@ -1,39 +1,49 @@
-This is a [Next.js](https://nextjs.org/) and [ElysiaJS](https://elysia.com) project.
+A simple socials platform for egg antifan built with Next.js, ElysiaJS, and TailwindCSS
 
-## Tech Stack
+## TODO
 
-1. [Next.js](https://nextjs.org/) - React Framework.
-2. [ElysiaJS](https://elysiajs.com) - API Framework.
-3. [Lucia](https://lucia-auth.com) - Authentication library.
-4. [Prisma](https://www.prisma.io/) - Database Toolkit.
-5. [SWR](https://swr.vercel.app/) - React Hooks library for data fetching.
-6. [Tailwind CSS](https://tailwindcss.com/) - A utility-first CSS framework.
+- [x] Create a basic layout
+- [x] Create a basic API (elysia)
+- [x] Authentication (lucia)
+- [ ] User profiles
+- [ ] Posts
+- [ ] Comments
+- [ ] Likes
+- [ ] Follows
 
 ## Getting Started
 
-First, add the following to your `.env` file:
+1. Clone the repository
 
 ```bash
-# .env.local
-DATABASE_URL=""
+git clone git@github.com:tiesen243/egg-community.git
 ```
 
-Then, run the following commands to create the database and run the migrations:
+2. Install dependencies
 
 ```bash
-# Elysia only runs on Bun
+bun install
+```
+
+3. Add a `.env` file
+
+```bash
+touch .env
+
+# Add the following to the .env file
+DATABASE_URL=
+```
+
+4. Run the development server
+
+```bash
 bun dev
 ```
 
-If you want to add more environment variables, you can add them to the `.env.local` file and remember to config in `env.mjs`:
+5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-And open [http://localhost:3000/api/elysia/docs](http://localhost:3000/api/elysia/docs) to see the API documentation.
+## Deploy on Vercel
 
-## Learn More
+The easiest way to deploy this project is to use the [Vercel Platform](https://vercel.com/new?utm_source=github&utm_medium=repository&utm_campaign=tiesen243/egg-community) from the creators of Next.js.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Documentation](https://tiesen.id.vn/blog/next-elysia) - my blog post about this project.
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Elysia Documentation](https://elysiajs.com) - learn about Elysia features and API.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.

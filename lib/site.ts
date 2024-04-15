@@ -36,22 +36,18 @@ export const siteConfig = {
     {
       label: HomeIcon,
       href: '/',
-      order: 1,
     },
     {
       label: RssIcon,
       href: '/following',
-      order: 1,
     },
     {
       label: SearchIcon,
       href: '/search',
-      order: 1,
     },
     {
       label: UserIcon,
       href: '/profile',
-      order: 3,
     },
   ],
 }
