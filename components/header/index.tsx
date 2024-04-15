@@ -22,7 +22,7 @@ export const Header: React.FC = async () => {
           <h1 className="text-2xl font-bold">Egg Community</h1>
         </Link>
 
-        {user ? <Tabs className="hidden md:flex" /> : <div className="flex-1" />}
+        {user ? <Tabs className="hidden md:flex" userId={user.id} /> : <div className="flex-1" />}
         <Menu name={user?.name} />
       </div>
     </header>

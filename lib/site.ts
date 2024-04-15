@@ -1,4 +1,4 @@
-import { HomeIcon, RssIcon, SearchIcon, UserIcon } from 'lucide-react'
+import { HomeIcon, RssIcon, SearchIcon } from 'lucide-react'
 
 export const getBaseUrl = () => {
   if (typeof window !== 'undefined') return window.location.origin
@@ -44,10 +44,6 @@ export const siteConfig = {
     {
       label: SearchIcon,
       href: '/search',
-    },
-    {
-      label: UserIcon,
-      href: '/profile',
     },
   ],
 }

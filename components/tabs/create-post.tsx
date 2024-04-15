@@ -20,7 +20,7 @@ export const CreatePost: React.FC = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="ghost" className="order-3 flex-1 text-muted-foreground">
+        <Button variant="ghost" className="flex-1 text-muted-foreground">
           <PencilIcon />
         </Button>
       </DialogTrigger>

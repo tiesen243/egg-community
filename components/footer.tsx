@@ -7,7 +7,7 @@ export const Footer: React.FC = async () => {
 
   return (
     <footer className="fixed bottom-0 left-0 z-50 w-full bg-background/70 py-2 backdrop-blur-xl backdrop-saturate-150 md:hidden">
-      <Tabs />
+      <Tabs userId={user.id} />
     </footer>
   )
 }

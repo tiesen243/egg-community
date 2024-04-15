@@ -20,5 +20,5 @@ export const lucia = new Lucia(adapter, {
     expires: false,
     attributes: { secure: env.NODE_ENV === 'production' },
   },
-  getUserAttributes: (attr) => ({ name: attr.name, email: attr.email }),
+  getUserAttributes: (attr) => ({ ...attr, password: undefined }),
 })

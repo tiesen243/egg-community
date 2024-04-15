@@ -12,4 +12,10 @@ const signUp = t.Object({
 
 const signIn = t.Omit(signUp, ['name'])
 
-export const userModel = new Elysia({ name: 'Model.User' }).model({ signUp, signIn })
+const getUser = t.Partial(
+  t.Object({
+    id: t.String(),
+  }),
+)
+
+export const userModel = new Elysia({ name: 'Model.User' }).model({ signUp, signIn, getUser })

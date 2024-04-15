@@ -50,3 +50,53 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
     const sessionCookie = lucia.createBlankSessionCookie()
     cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
   })
+
+  // [GET] /api/user/:id
+  .get(
+    '/info/:id',
+    async ({ db, params: { id }, query, error }) => {
+      const user = await db.user.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          name: true,
+          bio: true,
+          image: true,
+          createdAt: true,
+          posts: {
+            include: {
+              author: { select: { id: true, name: true, image: true } },
+              _count: { select: { likes: true, comments: true } },
+              likes: query.id ? { where: { userId: query.id } } : false,
+            },
+            orderBy: { createdAt: 'desc' },
+          },
+          password: false,
+          _count: {
+            select: { posts: true, followers: true, following: true },
+          },
+        },
+      })
+      if (!user) return error(404, { message: 'User not found' })
+
+      const isFollowing = query?.id
+        ? await db.user.findFirst({
+            where: { id: query.id, followers: { some: { id } } },
+          })
+        : false
+
+      const posts = user.posts.map((p) => ({
+        id: p.id,
+        content: p.content,
+        image: p.image,
+        createdAt: p.createdAt,
+        author: p.author,
+        isLiked: p.likes.length > 0,
+        likes: p._count.likes,
+        comments: p._count.comments,
+      }))
+
+      return { ...user, posts, isFollowing: !!isFollowing }
+    },
+    { query: 'getUser' },
+  )

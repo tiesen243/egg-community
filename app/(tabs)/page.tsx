@@ -1,27 +1,16 @@
 import type { NextPage } from 'next'
 
 import { PostCard } from '@/components/post-card'
+import { api } from '@/lib/api'
+import { auth } from '@/server/auth'
 
-const mockData = {
-  author: { id: 'a', name: 'TIesen', avatar: 'https://source.unsplash.com/random' },
-  content:
-    'Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.',
-  image: 'https://source.unsplash.com/random',
-  createdAt: '2021-10-10T10:00:00Z',
-  heartCount: 10,
-  replyCount: 5,
-}
+const Page: NextPage = async () => {
+  const { user } = await auth()
+  const { data, error } = await api.post.getAll.get({ query: { id: user?.id } })
 
-const Page: NextPage = () => {
-  return (
-    <ul>
-      {[...Array(10).fill(mockData)].map((data, idx) => (
-        <li key={idx}>
-          <PostCard post={data} />
-        </li>
-      ))}
-    </ul>
-  )
+  if (!data || error) return <div>Error: {error.value.message}</div>
+
+  return data.map((post) => <PostCard key={post.id} post={post} />)
 }
 
 export default Page

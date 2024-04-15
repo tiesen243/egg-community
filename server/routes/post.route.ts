@@ -7,49 +7,30 @@ export const postRoute = new Elysia({ name: 'Route.Post', prefix: '/post' })
   .use(context)
   .use(postModel)
 
-  .get('/getAll', async ({ db, error }) => {
-    const posts = await db.post.findMany({
-      include: { author: { select: { id: true, name: true } } },
-      orderBy: { createdAt: 'desc' },
-    })
-    if (!posts) return error(404, { message: 'No posts found' })
-    return posts
-  })
-  .post(
-    '/upload',
-    async ({ body: { file } }) => {
-      console.log(file)
-      return file
-    },
-    { body: 'uploadFile' },
-  )
-
-  .guard((app) =>
-    app
-      .onBeforeHandle(async ({ session, user, error }) => {
-        if (!session || !user) return error(401, { message: 'You are not authorized' })
+  .get(
+    '/getAll',
+    async ({ db, query, error }) => {
+      const posts = await db.post.findMany({
+        include: {
+          author: { select: { id: true, name: true, image: true } },
+          _count: { select: { likes: true, comments: true } },
+          likes: query.id ? { where: { userId: query.id } } : false,
+        },
+        orderBy: { createdAt: 'desc' },
       })
 
-      .post(
-        '/create',
-        async ({ db, body: { content }, user, error }) => {
-          const newPost = await db.post.create({
-            data: { content, author: { connect: { id: user?.id } } },
-          })
-          if (!newPost) return error(500, { message: 'Failed to create post' })
-          return { message: 'Post created successfully' }
-        },
-        { body: 'createPost' },
-      )
+      if (!posts) return error(404, { message: 'Posts not found' })
 
-      .delete(
-        '/del',
-        async ({ db, body: { id }, error }) => {
-          const post = await db.post.findUnique({ where: { id } })
-          if (!post) return error(404, { message: 'Post not found' })
-          await db.post.delete({ where: { id } })
-          return { message: 'Post deleted successfully' }
-        },
-        { body: 'deletePost' },
-      ),
+      return posts.map((p) => ({
+        id: p.id,
+        content: p.content,
+        image: p.image,
+        createdAt: p.createdAt,
+        author: p.author,
+        isLiked: p.likes.length > 0,
+        likes: p._count.likes,
+        comments: p._count.comments,
+      }))
+    },
+    { query: 'getAll' },
   )
