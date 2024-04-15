@@ -1,5 +1,6 @@
-import { PostCard } from '@/components/post-card'
 import type { NextPage } from 'next'
+
+import { PostCard } from '@/components/post-card'
 
 const mockData = {
   author: { id: 'a', name: 'TIesen', avatar: 'https://source.unsplash.com/random' },
