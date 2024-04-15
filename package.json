@@ -18,6 +18,7 @@
     "@elysiajs/swagger": "^1.0.3",
     "@lucia-auth/adapter-prisma": "^4.0.1",
     "@prisma/client": "5.12.1",
+    "@radix-ui/react-aspect-ratio": "^1.0.3",
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
     "@radix-ui/react-label": "^2.0.2",

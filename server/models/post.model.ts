@@ -1,6 +1,6 @@
 import Elysia, { t } from 'elysia'
 
-const getAll = t.Partial(
+const get = t.Partial(
   t.Object({
     id: t.String({ minLength: 4, error: 'ID must be at least 4 characters' }),
   }),
@@ -15,7 +15,7 @@ const deletePost = t.Object({
 })
 
 export const postModel = new Elysia({ name: 'Model.Post' }).model({
-  getAll,
+  get,
   createPost,
   deletePost,
 })

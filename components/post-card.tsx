@@ -1,5 +1,6 @@
 import { HeartIcon, MessageSquareIcon } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 import {
   Card,
@@ -9,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import Link from 'next/link'
+import { UserAvatar } from './user-avatar'
 
 interface Props {
   post: {
@@ -27,39 +28,34 @@ interface Props {
 export const PostCard: React.FC<Props> = ({ post }) => (
   <Card className="group border-none">
     <div className="absolute left-5 top-0 h-full w-[2px] bg-muted transition-colors ease-linear group-hover:bg-primary" />
-    <Link href={`/u/${post.author.id}`} className="absolute inset-0 h-fit">
-      <Image
-        src={post.author.image ?? '/og'}
-        alt={post.author.name}
-        width={40}
-        height={40}
-        className="absolute aspect-square h-auto rounded-full object-cover ring-2 ring-transparent transition-colors ease-linear group-hover:ring-ring"
-      />
-
-      <div className="space-y-1 pl-12">
+    <Link href={`/u/${post.author.id}`} className="absolute inset-0 z-10 flex h-fit gap-2">
+      <UserAvatar user={post.author} className="ring-ring group-hover:ring-2" />
+      <div>
         <CardTitle>{post.author.name}</CardTitle>
         <CardDescription>{new Date(post.createdAt).toDateString()}</CardDescription>
       </div>
     </Link>
 
-    <CardHeader className="mb-6 line-clamp-2 pb-0 pl-12 pt-12">
-      {post.content}
-      {post.content}
-    </CardHeader>
+    <Link href={`/p/${post.id}`}>
+      <CardHeader className="mb-6 line-clamp-2 pb-0 pl-12 pt-12">
+        {post.content}
+        {post.content}
+      </CardHeader>
 
-    {post.image && (
-      <CardContent className="pl-12">
-        <Image
-          src={post.image}
-          alt={post.content}
-          width={400}
-          height={300}
-          className="rounded-lg shadow-lg"
-        />
-      </CardContent>
-    )}
+      {post.image && (
+        <CardContent className="pl-12">
+          <Image
+            src={post.image}
+            alt={post.content}
+            width={400}
+            height={300}
+            className="rounded-lg shadow-lg"
+          />
+        </CardContent>
+      )}
+    </Link>
 
-    <CardFooter className="flex gap-4 pl-12">
+    <CardFooter className="gap-4 pl-12">
       <button className="flex gap-2">
         <HeartIcon
           className={
@@ -69,10 +65,10 @@ export const PostCard: React.FC<Props> = ({ post }) => (
         {post.likes}
       </button>
 
-      <button className="flex gap-2">
+      <div className="flex gap-2">
         <MessageSquareIcon />
         {post.comments}
-      </button>
+      </div>
     </CardFooter>
   </Card>
 )

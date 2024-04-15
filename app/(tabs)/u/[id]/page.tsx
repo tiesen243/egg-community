@@ -1,10 +1,10 @@
 import { PostCard } from '@/components/post-card'
 import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { UserAvatar } from '@/components/user-avatar'
 import { api } from '@/lib/api'
 import { auth } from '@/server/auth'
 import type { NextPage } from 'next'
-import Image from 'next/image'
 
 interface Props {
   params: { id: string }
@@ -38,13 +38,7 @@ const Page: NextPage<Props> = async ({ params }) => {
             )}
           </div>
 
-          <Image
-            src={user.image ?? '/og'}
-            alt={user.name}
-            width={150}
-            height={150}
-            className="aspect-square rounded-full object-cover"
-          />
+          <UserAvatar user={data} className="size-40" />
         </CardHeader>
       </Card>
 
