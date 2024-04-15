@@ -1,10 +1,11 @@
+import type { NextPage } from 'next'
+
 import { PostCard } from '@/components/post-card'
 import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { UserAvatar } from '@/components/user-avatar'
 import { api } from '@/lib/api'
 import { auth } from '@/server/auth'
-import type { NextPage } from 'next'
 
 interface Props {
   params: { id: string }
@@ -13,8 +14,8 @@ interface Props {
 const Page: NextPage<Props> = async ({ params }) => {
   const { user } = await auth()
 
-  const { data } = await api.user.info({ id: params.id }).get({ query: { id: user?.id } })
-  if (!user || !data) return null
+  const { data, error } = await api.user.info({ id: params.id }).get({ query: { id: user?.id } })
+  if (!data || error) return <div>Error: {error.value.message ?? 'Unknown error'}</div>
 
   return (
     <>
@@ -31,7 +32,7 @@ const Page: NextPage<Props> = async ({ params }) => {
               <strong>Following:</strong> {data._count.following}
             </p>
 
-            {data.id === user.id ? (
+            {data.id === user?.id ? (
               <Button className="w-full">Edit Profile</Button>
             ) : (
               <Button className="w-full">Follow</Button>
