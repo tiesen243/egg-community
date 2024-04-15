@@ -2,7 +2,7 @@ import Elysia, { t } from 'elysia'
 
 const get = t.Partial(
   t.Object({
-    id: t.String({ minLength: 4, error: 'ID must be at least 4 characters' }),
+    id: t.String(),
   }),
 )
 

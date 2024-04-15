@@ -91,7 +91,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
         image: p.image,
         createdAt: p.createdAt,
         author: p.author,
-        isLiked: p.likes.length > 0,
+        isLiked: p.likes ? p.likes.length > 0 : false,
         likes: p._count.likes,
         comments: p._count.comments,
       }))
