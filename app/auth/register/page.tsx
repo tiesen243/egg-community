@@ -2,26 +2,23 @@
 
 import type { NextPage } from 'next'
 import { useRouter } from 'next/navigation'
-import useSWRMutation from 'swr/mutation'
 
 import { Button } from '@/components/ui/button'
 import { FormField } from '@/components/ui/form-field'
 import { Typography } from '@/components/ui/typography'
 import { api } from '@/lib/api'
+import { useMutation } from '@/lib/swr'
 import { registerSchema } from '@/server/models/user.model'
 
 const Page: NextPage = () => {
   const router = useRouter()
-  const { trigger, isMutating, error } = useSWRMutation<unknown, Error, string, FormData>(
-    'login',
-    async (_, { arg }) => {
-      const inp = registerSchema.safeParse(Object.fromEntries(arg.entries()))
-      if (!inp.success) throw inp.error.flatten()
-      const { data, error } = await api.user['sign-up'].post(inp.data)
-      if (error) throw error.value
-      return data
-    },
-  )
+  const { trigger, isMutating, error } = useMutation('login', async (_, { arg }) => {
+    const inp = registerSchema.safeParse(Object.fromEntries(arg.entries()))
+    if (!inp.success) throw inp.error.flatten()
+    const { data, error } = await api.user['sign-up'].post(inp.data)
+    if (error) throw error.value
+    return data
+  })
 
   return (
     <form

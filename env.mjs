@@ -6,6 +6,9 @@ export const env = createEnv({
   server: {
     NODE_ENV: z.enum(['development', 'test', 'production']),
     DATABASE_URL: z.string(),
+    CLD_NAME: z.string(),
+    CLD_API_KEY: z.string(),
+    CLD_API_SECRET: z.string(),
   },
 
   // Client environment variables
@@ -14,6 +17,9 @@ export const env = createEnv({
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
     DATABASE_URL: process.env.DATABASE_URL,
+    CLD_NAME: process.env.CLD_NAME,
+    CLD_API_KEY: process.env.CLD_API_KEY,
+    CLD_API_SECRET: process.env.CLD_API_SECRET,
   },
 
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

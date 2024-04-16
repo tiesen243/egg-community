@@ -5,7 +5,6 @@ import { Header } from '@/components/header'
 import { Provider } from '@/components/provider'
 import { Toaster } from '@/components/ui/sonner'
 import { siteConfig } from '@/lib/site'
-import { cn } from '@/lib/utils'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
@@ -14,7 +13,7 @@ export const metadata: Metadata = siteConfig.meta
 
 const RootLayout: NextPage<React.PropsWithChildren> = ({ children }) => (
   <html lang="en" suppressHydrationWarning>
-    <body className={cn('font-sans', inter.variable)}>
+    <body className={`font-sans ${inter.variable}`}>
       <Provider>
         <Header />
         {children}

@@ -1,7 +1,7 @@
 const AuthLayout: React.FC<React.PropsWithChildren> = ({ children }) => (
-  <div className="flex h-[69dvh] w-full items-center justify-center [&>*]:container [&>*]:max-w-screen-md [&>*]:flex-1 [&>*]:space-y-4">
+  <main className="flex h-[69dvh] w-full items-center justify-center [&>*]:container [&>*]:max-w-screen-md [&>*]:flex-1 [&>*]:space-y-4">
     {children}
-  </div>
+  </main>
 )
 
 export default AuthLayout
