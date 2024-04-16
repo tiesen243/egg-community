@@ -16,8 +16,8 @@ A simple socials platform for egg antifan built with Next.js, ElysiaJS, and Tail
 - [ ] Create comments
 - [ ] Update comments
 - [ ] Delete comments
-- [ ] Likes
-- [ ] Dislikes
+- [x] Likes
+- [x] Dislikes
 - [ ] Search
 - [ ] Follows
 

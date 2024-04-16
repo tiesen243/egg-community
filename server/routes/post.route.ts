@@ -1,8 +1,8 @@
 import Elysia from 'elysia'
 
-import { context } from '@/server/plugins'
-import { postModel } from '@/server/models/post.model'
 import { deleteFile, saveFile } from '@/lib/cloudinary'
+import { postModel } from '@/server/models/post.model'
+import { context } from '@/server/plugins'
 
 export const postRoute = new Elysia({ name: 'Route.Post', prefix: '/post' })
   .use(context)
@@ -83,6 +83,20 @@ export const postRoute = new Elysia({ name: 'Route.Post', prefix: '/post' })
     },
     { body: 'createPost' },
   )
+
+  // [POST] /api/post/like/:id
+  .post('/like/:id', async ({ params: { id }, db, user, error }) => {
+    if (!user) return error(401, { message: 'You must be logged in to like a post' })
+    const post = await db.post.findUnique({ where: { id } })
+    if (!post) return error(404, { message: 'Post not found' })
+    const liked = await db.like.findFirst({ where: { postId: id, userId: user.id } })
+
+    if (liked) await db.like.delete({ where: { id: liked.id } })
+    else
+      await db.like.create({
+        data: { post: { connect: { id } }, user: { connect: { id: user.id } } },
+      })
+  })
 
   // [DELETE] /api/post/delete/:id
   .delete('/delete-post/:id', async ({ db, params: { id }, user, error }) => {

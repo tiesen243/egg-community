@@ -1,4 +1,4 @@
-import { HeartIcon, MessageSquareIcon } from 'lucide-react'
+import { MessageSquareIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { LikeBtn } from './like-btn'
 import { UserAvatar } from './user-avatar'
 
 interface Props {
@@ -37,10 +38,7 @@ export const PostCard: React.FC<Props> = ({ post }) => (
     </Link>
 
     <Link href={`/p/${post.id}`}>
-      <CardHeader className="mb-6 line-clamp-2 pb-0 pl-12 pt-12">
-        {post.content}
-        {post.content}
-      </CardHeader>
+      <CardHeader className="mb-6 line-clamp-2 pb-0 pl-12 pt-12">{post.content}</CardHeader>
 
       {post.image && (
         <CardContent className="pl-12">
@@ -56,14 +54,7 @@ export const PostCard: React.FC<Props> = ({ post }) => (
     </Link>
 
     <CardFooter className="gap-4 pl-12">
-      <button className="flex gap-2">
-        <HeartIcon
-          className={
-            post.isLiked ? 'fill-destructive stroke-destructive' : 'hover:stroke-destructive'
-          }
-        />
-        {post.likes}
-      </button>
+      <LikeBtn {...post} />
 
       <div className="flex gap-2">
         <MessageSquareIcon />
