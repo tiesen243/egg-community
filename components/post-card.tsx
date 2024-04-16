@@ -34,7 +34,7 @@ export const PostCard: React.FC<Props> = ({ post }) => (
         alt={post.author.name}
         width={40}
         height={40}
-        className="aspect-square rounded-full ring-ring group-hover:ring-2"
+        className="aspect-square size-10 rounded-full object-cover ring-ring group-hover:ring-2"
       />
 
       <div>

@@ -26,7 +26,7 @@ const Page: NextPage<Props> = async ({ params: { id } }) => {
           alt={data.author.name}
           width={64}
           height={64}
-          className="aspect-square rounded-full object-cover"
+          className="aspect-square size-16 rounded-full object-cover"
         />
 
         <div>

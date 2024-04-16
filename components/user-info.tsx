@@ -55,7 +55,7 @@ export const UserInfo: React.FC<Props> = ({ id, user }) => (
         alt={user.name}
         width={150}
         height={150}
-        className="aspect-square rounded-full"
+        className="aspect-square size-36 rounded-full object-cover"
       />
     </CardHeader>
   </Card>
