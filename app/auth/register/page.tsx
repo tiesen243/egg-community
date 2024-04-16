@@ -23,7 +23,7 @@ const Page: NextPage = () => {
 
   return (
     // prettier-ignore
-    <form action={(fd: FormData) => { trigger(fd) }}>
+    <form action={(fd)=>{ trigger(fd) }}>
       <Typography variant="h1">Register</Typography>
       <Typography>Create an account to start sharing your thoughts with the community.</Typography>
 

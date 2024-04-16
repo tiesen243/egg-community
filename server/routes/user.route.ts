@@ -61,18 +61,19 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
   .post(
     '/sign-up',
     async ({ db, body, error }) => {
-      const user = await db.user.findUnique({ where: { email: body.email } })
+      const { name, email } = body
+      const user = await db.user.findUnique({ where: { email } })
       if (user) return error(409, { message: 'User already exists' })
 
-      const hash = await new Scrypt().hash(body.password)
-      const newUser = await db.user.create({ data: { ...body, password: hash } })
+      const password = await new Scrypt().hash(body.password)
+      const newUser = await db.user.create({ data: { name, email, password } })
       if (!newUser) return error(500, { message: 'Failed to create user' })
 
       fetch(env.SEND_EMAIL, {
         method: 'POST',
         body: JSON.stringify({
           from: 'Egg Community',
-          to: newUser.email,
+          to: email,
           reply_to: env.EMAIL,
           subject: 'Welcome to Egg Community',
           message: `Hello ${newUser.name}, your account has been successfully created!<br>Thank you for joining us!`,
@@ -194,3 +195,25 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
     },
     { body: 'resetPassword' },
   )
+
+  // [DELETE] /user/delete
+  .delete('/delete-account', async ({ db, user, error }) => {
+    if (!user) return error(401, { message: 'You are not authorized' })
+
+    const deletedUser = await db.user.delete({ where: { id: user.id } })
+    if (!deletedUser) return error(500, { message: 'Failed to delete user' })
+    if (user.image) await deleteFile(user.image)
+
+    fetch(env.SEND_EMAIL, {
+      method: 'POST',
+      body: JSON.stringify({
+        from: 'Egg Community',
+        to: user.email,
+        reply_to: env.EMAIL,
+        subject: 'Account Deleted',
+        message: `Hello ${user.name}, your account has been successfully deleted!<br>We're sorry to see you go!`,
+      }),
+    })
+
+    return { message: 'User deleted successfully' }
+  })

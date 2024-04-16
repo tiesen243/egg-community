@@ -27,7 +27,7 @@ const typographyVariants = cva('font-sans', {
       default: 'text-foreground',
       primary: 'text-primary-foreground',
       secondary: 'text-secondary-foreground',
-      destructive: 'text-destructive-foreground',
+      destructive: 'text-destructive',
       muted: 'text-muted-foreground',
       accent: 'text-accent-foreground',
       success: 'text-green-600 dark:text-green-400',

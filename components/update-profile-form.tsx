@@ -32,7 +32,7 @@ export const UpdateProfileForm: React.FC<Props> = ({ user }) => {
 
   return (
     // prettier-ignore
-    <form action={(fd: FormData) => { trigger(fd) }} className="space-y-4">
+    <form action={(fd)=>{ trigger(fd) }} className="space-y-4">
       <FormField
         label="Name"
         name="name"

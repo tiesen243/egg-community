@@ -22,7 +22,7 @@ export const ChangePasswordForm: React.FC = () => {
   })
   return (
     // prettier-ignore
-    <form action={(fd:FormData)=>{ trigger(fd) }} className='space-y-4'>
+    <form action={(fd)=>{ trigger(fd) }} className='space-y-4'>
       {fields.map((field) => (
         <FormField key={field.name} {...field} type='password'message={error?.fieldErrors?.[field.name]} />
       ))}

@@ -21,7 +21,7 @@ const Page: NextPage = () => {
   })
   return (
     // prettier-ignore
-    <form action={(fd:FormData)=>{ trigger(fd) }}>
+    <form action={(fd)=>{ trigger(fd) }}>
       <Typography variant="h1">Reset Password</Typography>
       <Typography>
         Enter your email address and we will send you a link to reset your password.
