@@ -1,20 +1,15 @@
-'use client'
-
 import { useMutation } from '@/lib/swr'
 import { PencilIcon } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
 import { DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { FormField } from '@/components/ui/form-field'
+import { api } from '@/lib/api'
+import { fileToBase64 } from '@/lib/utils'
 import { updateSchema } from '@/server/models/post.model'
 
-interface Props {
-  post: {
-    id: string
-    content: string
-  }
-}
 export const UpdatePostTrigger: React.FC = () => (
   <DialogTrigger asChild>
     <DropdownMenuItem>
@@ -23,11 +18,27 @@ export const UpdatePostTrigger: React.FC = () => (
   </DialogTrigger>
 )
 
-export const UpdatePostContent: React.FC<Props> = ({ post }) => {
+interface Props {
+  post: {
+    id: string
+    content: string
+  }
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+export const UpdatePostContent: React.FC<Props> = ({ post, setOpen }) => {
+  const router = useRouter()
   const { trigger, isMutating, error } = useMutation('post', async (_, { arg }) => {
     const inp = updateSchema.safeParse(Object.fromEntries(arg.entries()))
     if (!inp.success) throw inp.error.flatten()
-    console.log(inp.data)
+    const { data, error } = await api.post.update({ id: post.id }).patch({
+      content: inp.data.content,
+      image: await fileToBase64(inp.data.image),
+    })
+    if (error) throw error.value
+    router.refresh()
+    setOpen(false)
+    return data
   })
 
   return (

@@ -11,7 +11,7 @@ A simple socials platform for egg antifan built with Next.js, ElysiaJS, and Tail
 - [x] Reset password
 - [x] Delete account
 - [x] Crete posts
-- [ ] Update posts
+- [x] Update posts
 - [x] Delete posts
 - [ ] Create comments
 - [ ] Update comments

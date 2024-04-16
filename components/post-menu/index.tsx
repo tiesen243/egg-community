@@ -1,3 +1,5 @@
+'use client'
+
 import { EllipsisIcon } from 'lucide-react'
 
 import { Dialog } from '@/components/ui/dialog'
@@ -8,6 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { DeleteBtn } from './delete-btn'
 import { UpdatePostContent, UpdatePostTrigger } from './update-post'
+import { useState } from 'react'
 
 interface Props {
   post: {
@@ -22,19 +25,22 @@ interface Props {
   }
 }
 
-export const PostMenu: React.FC<Props> = ({ post }) => (
-  <Dialog>
-    <DropdownMenu>
-      <DropdownMenuTrigger className="absolute right-0 top-0 z-20">
-        <EllipsisIcon className="z-20" />
-      </DropdownMenuTrigger>
+export const PostMenu: React.FC<Props> = ({ post }) => {
+  const [open, setOpen] = useState<boolean>(false)
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DropdownMenu>
+        <DropdownMenuTrigger className="absolute right-0 top-0 z-20">
+          <EllipsisIcon className="z-20" />
+        </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end">
-        <UpdatePostTrigger />
-        <DeleteBtn id={post.id} />
-      </DropdownMenuContent>
-    </DropdownMenu>
+        <DropdownMenuContent align="end">
+          <UpdatePostTrigger />
+          <DeleteBtn id={post.id} />
+        </DropdownMenuContent>
+      </DropdownMenu>
 
-    <UpdatePostContent post={post} />
-  </Dialog>
-)
+      <UpdatePostContent post={post} setOpen={setOpen} />
+    </Dialog>
+  )
+}

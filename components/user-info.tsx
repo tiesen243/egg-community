@@ -26,10 +26,16 @@ export const UserInfo: React.FC<Props> = ({ user }) => (
         <CardDescription>{user.bio ?? 'No bio available'}</CardDescription>
         <CardDescription>Joined at: {new Date(user.createdAt).toDateString()}</CardDescription>
 
-        <p className="space-x-2">
-          <strong>Post:</strong> {user._count.posts}
-          <strong>Followers:</strong> {user._count.followers}
-          <strong>Following:</strong> {user._count.following}
+        <p className="flex gap-2">
+          <span>
+            <strong>Post:</strong> {user._count.posts}
+          </span>
+          <span>
+            <strong>Followers:</strong> {user._count.followers}
+          </span>
+          <span>
+            <strong>Following:</strong> {user._count.following}
+          </span>
         </p>
 
         {user.id === user?.id ? (
@@ -41,7 +47,7 @@ export const UserInfo: React.FC<Props> = ({ user }) => (
         )}
       </div>
 
-      <UserAvatar user={user} className="size-40" />
+      <UserAvatar user={user} className="size-36" />
     </CardHeader>
   </Card>
 )

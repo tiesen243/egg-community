@@ -7,7 +7,7 @@ import { auth } from '@/server/auth'
 export const revalidate = 1
 const Page: NextPage = async () => {
   const { user } = await auth()
-  const { data, error } = await api.post['geta-all'].get({ query: { id: user?.id ?? '' } })
+  const { data, error } = await api.post['get-all'].get({ query: { id: user?.id ?? '' } })
 
   if (!data || error) return <div>Error: {error.value.message ?? 'Unknown error'}</div>
 

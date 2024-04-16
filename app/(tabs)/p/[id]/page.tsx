@@ -1,13 +1,14 @@
 import type { NextPage } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { MessageSquareIcon } from 'lucide-react'
+import Image from 'next/image'
 
+import { LikeBtn } from '@/components/like-btn'
 import { Typography } from '@/components/ui/typography'
 import { UserAvatar } from '@/components/user-avatar'
 import { api } from '@/lib/api'
 import { auth } from '@/server/auth'
-import { HeartIcon, MessageSquareIcon } from 'lucide-react'
-import Image from 'next/image'
 
 interface Props {
   params: { id: string }
@@ -17,10 +18,11 @@ const Page: NextPage<Props> = async ({ params: { id } }) => {
   const { user } = await auth()
   const { data, error } = await api.post['get-one']({ id }).get({ query: { id: user?.id } })
   if (!data || error) return notFound()
+
   return (
     <>
       <Link href={`/u/${data.author.id}`} className="flex items-center gap-4">
-        <UserAvatar user={data.author} className="size-20" />
+        <UserAvatar user={data.author} className="size-16" />
 
         <div>
           <Typography variant="h3">{data.author.name}</Typography>
@@ -43,16 +45,7 @@ const Page: NextPage<Props> = async ({ params: { id } }) => {
       )}
 
       <section className="flex items-center gap-4">
-        <button className="group flex gap-2">
-          <HeartIcon
-            className={
-              data.isLiked
-                ? 'fill-destructive stroke-destructive'
-                : 'group-hover:stroke-destructive'
-            }
-          />
-          {data.likes}
-        </button>
+        <LikeBtn {...data} />
 
         <div className="flex gap-2">
           <MessageSquareIcon />

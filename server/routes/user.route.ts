@@ -18,9 +18,9 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
     '/get-all',
     async ({ db, query, error }) => {
       const users = await db.user.findMany({
+        where: query.keyword ? { name: { contains: query.keyword } } : {},
         select: { id: true, name: true, image: true },
         orderBy: { createdAt: 'desc' },
-        where: query.keyword ? { name: { contains: query.keyword } } : {},
       })
       if (!users) return error(404, { message: 'Users not found' })
 
@@ -33,6 +33,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
   .get(
     '/info/:id',
     async ({ db, params: { id }, query, error }) => {
+      const isAuth = query.id !== 'undefined'
       const user = await db.user.findUnique({
         where: { id },
         include: {
@@ -40,21 +41,17 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
             include: {
               author: { select: { id: true, name: true, image: true } },
               _count: { select: { likes: true, comments: true } },
-              likes: query.id ? { where: { userId: query.id } } : false,
+              likes: isAuth ? { where: { id: query.id } } : false,
             },
             orderBy: { createdAt: 'desc' },
           },
-          _count: {
-            select: { posts: true, followers: true, following: true },
-          },
+          _count: { select: { posts: true, followers: true, following: true } },
         },
       })
       if (!user) return error(404, { message: 'User not found' })
 
-      const isFollowing = query?.id
-        ? await db.user.findFirst({
-            where: { id: query.id, followers: { some: { id } } },
-          })
+      const isFollowing = isAuth
+        ? await db.user.findFirst({ where: { id: query.id, followers: { some: { id } } } })
         : false
 
       const posts = user.posts.map((p) => ({

@@ -10,7 +10,7 @@ export const postRoute = new Elysia({ name: 'Route.Post', prefix: '/post' })
 
   // [POST] /api/post/get-all
   .get(
-    '/geta-all',
+    '/get-all',
     async ({ db, query, error }) => {
       const posts = await db.post.findMany({
         include: {
@@ -97,6 +97,32 @@ export const postRoute = new Elysia({ name: 'Route.Post', prefix: '/post' })
         data: { post: { connect: { id } }, user: { connect: { id: user.id } } },
       })
   })
+
+  // [PATCH] /api/post/update/:id
+  .patch(
+    '/update/:id',
+    async (ctx) => {
+      if (!ctx.user) return ctx.error(401, { message: 'You must be logged in to update a post' })
+      const post = await ctx.db.post.findUnique({ where: { id: ctx.params.id } })
+      if (!post) return ctx.error(404, { message: 'Post not found' })
+      if (post.authorId !== ctx.user.id)
+        return ctx.error(403, { message: 'You are not a author of this post' })
+
+      const image = ctx.body.image
+        ? await saveFile(ctx.body.image, 'post').then((res) => (res?.error ? null : res?.url))
+        : null
+
+      await ctx.db.post.update({
+        where: { id: ctx.params.id },
+        data: { content: ctx.body.content, image },
+      })
+      if (!post) return ctx.error(500, { message: 'Failed to update post' })
+
+      if (post.image && image) await deleteFile(post.image)
+      return { message: 'Post updated successfully' }
+    },
+    { body: 'updatePost' },
+  )
 
   // [DELETE] /api/post/delete/:id
   .delete('/delete-post/:id', async ({ db, params: { id }, user, error }) => {
