@@ -17,15 +17,13 @@ const Page: NextPage = () => {
     if (!inp.success) throw inp.error.flatten()
     const { data, error } = await api.user['sign-up'].post(inp.data)
     if (error) throw error.value
+    router.push('/auth/login')
     return data
   })
 
   return (
-    <form
-      action={(fd: FormData) => {
-        trigger(fd).then(() => router.push('/auth/login'))
-      }}
-    >
+    // prettier-ignore
+    <form action={(fd: FormData) => { trigger(fd) }}>
       <Typography variant="h1">Register</Typography>
       <Typography>Create an account to start sharing your thoughts with the community.</Typography>
 

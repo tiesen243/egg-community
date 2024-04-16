@@ -173,7 +173,24 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
       if (!user) return error(404, { message: 'User not found' })
 
       const newPassword = `Egg#${Math.floor(1000000 + Math.random() * 9000000)}`
-      console.log(newPassword)
+      const newUser = await db.user.update({
+        where: { id: user.id },
+        data: { password: await new Scrypt().hash(newPassword) },
+      })
+      if (!newUser) return error(500, { message: 'Failed to reset password' })
+
+      fetch(env.SEND_EMAIL, {
+        method: 'POST',
+        body: JSON.stringify({
+          from: 'Egg Community',
+          to: user.email,
+          reply_to: env.EMAIL,
+          subject: 'Password Reset',
+          message: `Hello ${user.name}, your password has been successfully reset!<br>Your new password is: <b>${newPassword}</b>`,
+        }),
+      })
+
+      return { message: 'Password reset successfully' }
     },
     { body: 'resetPassword' },
   )

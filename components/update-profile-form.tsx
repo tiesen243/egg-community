@@ -31,12 +31,8 @@ export const UpdateProfileForm: React.FC<Props> = ({ user }) => {
   })
 
   return (
-    <form
-      action={(fd: FormData) => {
-        trigger(fd)
-      }}
-      className="space-y-4"
-    >
+    // prettier-ignore
+    <form action={(fd: FormData) => { trigger(fd) }} className="space-y-4">
       <FormField
         label="Name"
         name="name"

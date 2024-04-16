@@ -17,18 +17,14 @@ const Page: NextPage = () => {
     if (!inp.success) throw inp.error.flatten()
     const { data, error } = await api.user['sign-in'].post(inp.data)
     if (error) throw error.value
+    router.push('/')
+    router.refresh()
     return data
   })
 
   return (
-    <form
-      action={(fd: FormData) => {
-        trigger(fd).then(() => {
-          router.push('/')
-          router.refresh()
-        })
-      }}
-    >
+    // prettier-ignore
+    <form action={(fd:FormData)=>{ trigger(fd) }}>
       <Typography variant="h1">Login</Typography>
       <Typography>
         Welcome back! Please login to continue sharing your thoughts with the community.
