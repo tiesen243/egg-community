@@ -13,7 +13,7 @@ export const postRoute = new Elysia({ name: 'Route.Post', prefix: '/post' })
     '/get-all',
     async ({ db, query, error }) => {
       const posts = await db.post.findMany({
-        where: query.keyword ? { content: { contains: query.keyword } } : {},
+        where: query.keyword ? { content: { contains: query.keyword, mode: 'insensitive' } } : {},
         include: {
           author: { select: { id: true, name: true, image: true } },
           _count: { select: { likes: true, comments: true } },

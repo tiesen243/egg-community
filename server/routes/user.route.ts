@@ -18,7 +18,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
     '/get-all',
     async ({ db, query, error }) => {
       const users = await db.user.findMany({
-        where: query.keyword ? { name: { contains: query.keyword } } : {},
+        where: query.keyword ? { name: { contains: query.keyword, mode: 'insensitive' } } : {},
         select: { id: true, name: true, image: true },
         orderBy: { createdAt: 'desc' },
       })
