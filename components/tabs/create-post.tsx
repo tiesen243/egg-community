@@ -33,7 +33,12 @@ export const CreatePost: React.FC = () => {
           </DialogDescription>
 
           <form action={action} className="my-2 space-y-4">
-            <FormField name="content" placeholder="What’s on your mind?" rows={3} multiline />
+            <FormField<HTMLTextAreaElement>
+              name="content"
+              placeholder="What’s on your mind?"
+              rows={3}
+              multiline
+            />
             <FormField name="image" type="file" accept="image/*" />
 
             <Button type="submit" className="w-full">
