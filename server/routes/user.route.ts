@@ -18,12 +18,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
     async ({ db, params: { id }, query, error }) => {
       const user = await db.user.findUnique({
         where: { id },
-        select: {
-          id: true,
-          name: true,
-          bio: true,
-          image: true,
-          createdAt: true,
+        include: {
           posts: {
             include: {
               author: { select: { id: true, name: true, image: true } },
@@ -32,7 +27,6 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
             },
             orderBy: { createdAt: 'desc' },
           },
-          password: false,
           _count: {
             select: { posts: true, followers: true, following: true },
           },
@@ -57,7 +51,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
         comments: p._count.comments,
       }))
 
-      return { ...user, posts, isFollowing: !!isFollowing }
+      return { ...user, password: '', posts, isFollowing: !!isFollowing }
     },
     { query: 'getUser' },
   )
@@ -109,9 +103,8 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
     '/update',
     async ({ db, user, body, error }) => {
       const newAvatar = await saveFile(body.avatar!, 'avatar').then((res) =>
-        res.error ? user?.image : res.url,
+        res?.error ? user?.image : res?.url,
       )
-      console.log(newAvatar)
 
       const newUser = await db.user.update({
         where: { id: user?.id },

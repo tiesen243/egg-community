@@ -27,6 +27,7 @@ export const FormField = <T extends HTMLInputElement | HTMLTextAreaElement = HTM
           {label} {props.required && '(*)'}
         </Label>
       )}
+      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
       <Comp {...(props as any)} className={message ? 'border-destructive' : ''} />
       <span className="text-sm text-destructive">{message ?? ''}</span>
     </div>

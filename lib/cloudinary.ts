@@ -12,8 +12,8 @@ export const saveFile = async (base64: string, folder: 'avatar' | 'post') => {
   try {
     const result = await cloudinary.uploader.upload(base64, { folder: `egg-community/${folder}` })
     return { url: result.url }
-  } catch (error: any) {
-    return { error: error.message, url: '' }
+  } catch (error) {
+    if (error instanceof Error) return { error: error.message, url: '' }
   }
 }
 
