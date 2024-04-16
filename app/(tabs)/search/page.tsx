@@ -26,8 +26,6 @@ const Page: NextPage<Props> = async ({ searchParams: { keyword } }) => {
   const { data: posts } = await api.post['get-all'].get({ query: { keyword, id: user?.id } })
   const { data: users } = await api.user['get-all'].get({ query: { keyword } })
 
-  console.log({ posts, users })
-
   return (
     <>
       <form action={search} className="flex items-center gap-4">
