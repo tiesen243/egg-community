@@ -23,7 +23,7 @@ export const Header: React.FC = async () => {
         </Link>
 
         {user ? <Tabs className="hidden md:flex" userId={user.id} /> : <div className="flex-1" />}
-        <Menu name={user?.name} />
+        <Menu id={user?.id} name={user?.name} />
       </div>
     </header>
   )

@@ -5,10 +5,20 @@ A simple socials platform for egg antifan built with Next.js, ElysiaJS, and Tail
 - [x] Create a basic layout
 - [x] Create a basic API (elysia)
 - [x] Authentication (lucia)
-- [ ] User profiles
-- [ ] Posts
-- [ ] Comments
+- [x] User profiles
+- [x] Update user profiles
+- [x] Change password
+- [ ] Reset password
+- [ ] Delete account
+- [ ] Crete posts
+- [ ] Update posts
+- [ ] Delete posts
+- [ ] Create comments
+- [ ] Update comments
+- [ ] Delete comments
 - [ ] Likes
+- [ ] Dislikes
+- [ ] Search
 - [ ] Follows
 
 ## Getting Started

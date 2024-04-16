@@ -6,7 +6,8 @@ import { db } from '@/prisma'
 import { userModel } from '@/server/models/user.model'
 import { context } from '@/server/plugins'
 import { lucia } from '@/server/auth/lucia'
-import { saveFile } from '@/lib/cloudinary'
+import { deleteFile, saveFile } from '@/lib/cloudinary'
+import { env } from '@/env.mjs'
 
 export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
   .use(context)
@@ -66,6 +67,18 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
       const hash = await new Scrypt().hash(body.password)
       const newUser = await db.user.create({ data: { ...body, password: hash } })
       if (!newUser) return error(500, { message: 'Failed to create user' })
+
+      fetch(env.SEND_EMAIL, {
+        method: 'POST',
+        body: JSON.stringify({
+          from: 'Egg Community',
+          to: newUser.email,
+          reply_to: env.EMAIL,
+          subject: 'Welcome to Egg Community',
+          message: `Hello ${newUser.name}, your account has been successfully created!<br>Thank you for joining us!`,
+        }),
+      })
+
       return { message: 'User created successfully' }
     },
     { body: 'signUp' },
@@ -79,7 +92,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
       if (!user) return error(404, { message: 'User not found' })
 
       const isValid = await new Scrypt().verify(user.password, password)
-      if (!isValid) return error(401, { message: 'Invalid password' })
+      if (!isValid) return error(401, { message: 'Password is incorrect' })
 
       const session = await lucia.createSession(user.id, {})
       const sessionCookie = lucia.createSessionCookie(session.id)
@@ -96,14 +109,14 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
     cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
   })
 
-  .onBeforeHandle(({ user, error }) => !user && error(401, { message: 'Unauthorized' }))
-
   // [PATCH] /user/update
   .patch(
     '/update',
     async ({ db, user, body, error }) => {
+      if (!user) return error(401, { message: 'Unauthorized' })
+
       const newAvatar = await saveFile(body.avatar!, 'avatar').then((res) =>
-        res?.error ? user?.image : res?.url,
+        res?.error ? user.image : res?.url,
       )
 
       const newUser = await db.user.update({
@@ -115,7 +128,52 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
         },
       })
       if (!newUser) return error(500, { message: 'Failed to update user' })
+
+      if (body.avatar && user?.image) await deleteFile(user.image)
       return { message: 'User updated successfully' }
     },
     { body: 'update' },
+  )
+
+  // [PATCH] /user/change-password
+  .patch(
+    '/change-password',
+    async ({ db, user, body, error }) => {
+      if (!user) return error(401, { message: 'Unauthorized' })
+      const isValid = await new Scrypt().verify(user.password, body.oldPassword)
+      if (!isValid) return error(401, { message: 'Password is incorrect' })
+
+      const newUser = await db.user.update({
+        where: { id: user.id },
+        data: { password: await new Scrypt().hash(body.newPassword) },
+      })
+      if (!newUser) return error(500, { message: 'Failed to update password' })
+
+      fetch(env.SEND_EMAIL, {
+        method: 'POST',
+        body: JSON.stringify({
+          from: 'Egg Community',
+          to: user.email,
+          reply_to: env.EMAIL,
+          subject: 'Password Changed',
+          message: `Hello ${user.name}, your password has been successfully changed!<br>If you didn't do this, please contact us immediately.`,
+        }),
+      })
+
+      return { message: 'Password changed successfully' }
+    },
+    { body: 'changePassword' },
+  )
+
+  // [PATCH] /user/reset-password
+  .patch(
+    '/reset-password',
+    async ({ db, body, error }) => {
+      const user = await db.user.findUnique({ where: { email: body.email } })
+      if (!user) return error(404, { message: 'User not found' })
+
+      const newPassword = `Egg#${Math.floor(1000000 + Math.random() * 9000000)}`
+      console.log(newPassword)
+    },
+    { body: 'resetPassword' },
   )

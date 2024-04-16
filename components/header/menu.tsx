@@ -14,8 +14,8 @@ import { Typography } from '../ui/typography'
 import { LogOutBtn } from './log-out-btn'
 import { ThemeBtn } from './theme-btn'
 
-export const Menu: React.FC<{ name?: string }> = async ({ name }) => {
-  if (!name)
+export const Menu: React.FC<{ id?: string; name?: string }> = async ({ id, name }) => {
+  if (!id || !name)
     return (
       <Typography variant="link" href="/auth/login">
         Login
@@ -33,7 +33,7 @@ export const Menu: React.FC<{ name?: string }> = async ({ name }) => {
         <DropdownMenuSeparator />
 
         <DropdownMenuGroup>
-          <Link href="/settings" passHref>
+          <Link href={`/u/${id}/settings`} passHref>
             <DropdownMenuItem>
               <SettingsIcon className="mr-2" /> Settings
             </DropdownMenuItem>

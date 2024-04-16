@@ -20,26 +20,40 @@ const update = t.Partial(
   }),
 )
 
+const changePassword = t.Object({
+  oldPassword: t.String(),
+  newPassword: t.String(),
+  confirmNewPassword: t.String(),
+})
+
+const resetPassword = t.Object({
+  email: t.String(),
+})
+
 export const userModel = new Elysia({ name: 'Model.User' }).model({
   getUser,
   signUp,
   signIn,
   update,
+  changePassword,
+  resetPassword,
 })
+
+const passwordSchema = z
+  .string()
+  .regex(
+    /^(?!.*\s)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[~`!@#$%^&*()--+={}\[\]|\\:;"'<>,.?/_₹]).{8,16}$/,
+    {
+      message:
+        'Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number and 1 special character',
+    },
+  )
 
 export const registerSchema = z
   .object({
     name: z.string().min(4, { message: 'Name must be at least 4 characters long' }),
     email: z.string().email(),
-    password: z
-      .string()
-      .regex(
-        /^(?!.*\s)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[~`!@#$%^&*()--+={}\[\]|\\:;"'<>,.?/_₹]).{8,16}$/,
-        {
-          message:
-            'Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number and 1 special character',
-        },
-      ),
+    password: passwordSchema,
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -49,19 +63,26 @@ export const registerSchema = z
 
 export const loginSchema = z.object({
   email: z.string().email(),
-  password: z
-    .string()
-    .regex(
-      /^(?!.*\s)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[~`!@#$%^&*()--+={}\[\]|\\:;"'<>,.?/_₹]).{8,16}$/,
-      {
-        message:
-          'Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number and 1 special character',
-      },
-    ),
+  password: passwordSchema,
 })
 
 export const updateSchema = z.object({
   name: z.optional(z.string().min(4, { message: 'Name must be at least 4 characters long' })),
   bio: z.optional(z.string().min(4, { message: 'Bio must be at least 4 characters long' })),
   avatar: z.optional(z.instanceof(File)),
+})
+
+export const changePasswordSchema = z
+  .object({
+    oldPassword: z.string().min(8, { message: 'Password must be at least 8 characters long' }),
+    newPassword: passwordSchema,
+    confirmNewPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmNewPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmNewPassword'],
+  })
+
+export const resetPasswordSchema = z.object({
+  email: z.string().email(),
 })

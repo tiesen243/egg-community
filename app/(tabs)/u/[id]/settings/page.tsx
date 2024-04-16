@@ -1,3 +1,4 @@
+import { ChangePasswordForm } from '@/components/change-password-form'
 import { Separator } from '@/components/ui/separator'
 import { Typography } from '@/components/ui/typography'
 import { UpdateProfileForm } from '@/components/update-profile-form'
@@ -24,6 +25,8 @@ const Page: NextPage<Props> = async ({ params }) => {
       <Separator className="mt-4" />
 
       <Typography variant="h3">Change Password</Typography>
+
+      <ChangePasswordForm />
     </>
   )
 }

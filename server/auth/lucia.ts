@@ -8,7 +8,7 @@ import { db } from '@/prisma'
 declare module 'lucia' {
   interface Register {
     Lucia: typeof lucia
-    DatabaseUserAttributes: Omit<User, 'password'>
+    DatabaseUserAttributes: User
   }
 }
 
@@ -20,5 +20,5 @@ export const lucia = new Lucia(adapter, {
     expires: false,
     attributes: { secure: env.NODE_ENV === 'production' },
   },
-  getUserAttributes: (attr) => ({ ...attr, password: undefined }),
+  getUserAttributes: (attr) => attr,
 })

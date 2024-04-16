@@ -9,6 +9,8 @@ export const env = createEnv({
     CLD_NAME: z.string(),
     CLD_API_KEY: z.string(),
     CLD_API_SECRET: z.string(),
+    EMAIL: z.string().email(),
+    SEND_EMAIL: z.string(),
   },
 
   // Client environment variables
@@ -20,6 +22,8 @@ export const env = createEnv({
     CLD_NAME: process.env.CLD_NAME,
     CLD_API_KEY: process.env.CLD_API_KEY,
     CLD_API_SECRET: process.env.CLD_API_SECRET,
+    EMAIL: process.env.EMAIL,
+    SEND_EMAIL: process.env.SEND_EMAIL,
   },
 
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
