@@ -4,7 +4,10 @@ import useSWRMutation, { type SWRMutationConfiguration } from 'swr/mutation'
 
 export const useMutation = (
   key: Key,
-  fetcher: (key: Key, options: Readonly<{ arg: FormData }>) => Promise<{ message: string } | void>,
+  fetcher: (
+    key: Key,
+    options: Readonly<{ arg: FormData }>,
+  ) => Promise<{ message: string } | void> | void,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   config?: SWRMutationConfiguration<any, Error>,
 ) =>

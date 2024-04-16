@@ -15,7 +15,7 @@ interface Props {
 
 const Page: NextPage<Props> = async ({ params: { id } }) => {
   const { user } = await auth()
-  const { data, error } = await api.post.getOne({ id }).get({ query: { id: user?.id } })
+  const { data, error } = await api.post['get-one']({ id }).get({ query: { id: user?.id } })
   if (!data || error) return notFound()
   return (
     <>

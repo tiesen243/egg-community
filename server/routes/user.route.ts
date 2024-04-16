@@ -13,6 +13,22 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
   .use(context)
   .use(userModel)
 
+  // [GET] /api/user/get-all
+  .get(
+    '/get-all',
+    async ({ db, query, error }) => {
+      const users = await db.user.findMany({
+        select: { id: true, name: true, image: true },
+        orderBy: { createdAt: 'desc' },
+        where: query.keyword ? { name: { contains: query.keyword } } : {},
+      })
+      if (!users) return error(404, { message: 'Users not found' })
+
+      return users
+    },
+    { query: 'getUsers' },
+  )
+
   // [GET] /api/user/:id
   .get(
     '/info/:id',
@@ -57,7 +73,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
     { query: 'getUser' },
   )
 
-  // [POST] /user/sign-up
+  // [POST] /api/user/sign-up
   .post(
     '/sign-up',
     async ({ db, body, error }) => {

@@ -2,14 +2,15 @@ import Elysia from 'elysia'
 
 import { context } from '@/server/plugins'
 import { postModel } from '@/server/models/post.model'
+import { deleteFile, saveFile } from '@/lib/cloudinary'
 
 export const postRoute = new Elysia({ name: 'Route.Post', prefix: '/post' })
   .use(context)
   .use(postModel)
 
-  // [POST] /post/create
+  // [POST] /api/post/get-all
   .get(
-    '/getAll',
+    '/geta-all',
     async ({ db, query, error }) => {
       const posts = await db.post.findMany({
         include: {
@@ -18,6 +19,7 @@ export const postRoute = new Elysia({ name: 'Route.Post', prefix: '/post' })
           likes: query.id ? { where: { userId: query.id } } : false,
         },
         orderBy: { createdAt: 'desc' },
+        where: query.keyword ? { content: { contains: query.keyword } } : {},
       })
 
       if (!posts) return error(404, { message: 'Posts not found' })
@@ -36,9 +38,9 @@ export const postRoute = new Elysia({ name: 'Route.Post', prefix: '/post' })
     { query: 'get' },
   )
 
-  // [GET] /post/getOne/:id
+  // [GET] /api/post/get-one/:id
   .get(
-    '/getOne/:id',
+    '/get-one/:id',
     async ({ db, params: { id }, query, error }) => {
       const post = await db.post.findUnique({
         where: { id },
@@ -64,3 +66,29 @@ export const postRoute = new Elysia({ name: 'Route.Post', prefix: '/post' })
     },
     { query: 'get' },
   )
+
+  // [POST] /api/post/create
+  .post(
+    '/create',
+    async ({ db, body, user, error }) => {
+      if (!user) return error(401, { message: 'You must be logged in to create a post' })
+      const image = body.image
+        ? await saveFile(body.image, 'post').then((res) => (res?.error ? null : res?.url))
+        : null
+      const post = await db.post.create({
+        data: { content: body.content, image, author: { connect: { id: user.id } } },
+      })
+      if (!post) return error(500, { message: 'Failed to create post' })
+      return { message: 'Post created successfully' }
+    },
+    { body: 'createPost' },
+  )
+
+  // [DELETE] /api/post/delete/:id
+  .delete('/delete-post/:id', async ({ db, params: { id }, user, error }) => {
+    if (!user) return error(401, { message: 'You must be logged in to delete a post' })
+    const post = await db.post.delete({ where: { id } })
+    if (!post) return error(404, { message: 'Post not found' })
+    post.image && (await deleteFile(post.image))
+    return { message: 'Post deleted successfully' }
+  })

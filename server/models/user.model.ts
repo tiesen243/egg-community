@@ -1,6 +1,8 @@
 import Elysia, { t } from 'elysia'
 import { z } from 'zod'
 
+const getUsers = t.Partial(t.Object({ keyword: t.String() }))
+
 const getUser = t.Partial(t.Object({ id: t.String() }))
 
 const signUp = t.Object({
@@ -31,6 +33,7 @@ const resetPassword = t.Object({
 })
 
 export const userModel = new Elysia({ name: 'Model.User' }).model({
+  getUsers,
   getUser,
   signUp,
   signIn,

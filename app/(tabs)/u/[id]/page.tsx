@@ -4,6 +4,7 @@ import { PostCard } from '@/components/post-card'
 import { UserInfo } from '@/components/user-info'
 import { api } from '@/lib/api'
 import { auth } from '@/server/auth'
+import { PostMenu } from '@/components/post-menu'
 
 interface Props {
   params: { id: string }
@@ -19,9 +20,14 @@ const Page: NextPage<Props> = async ({ params }) => {
     <>
       <UserInfo user={data} />
 
-      {data.posts.map((post) => (
-        <PostCard key={post.id} post={post} />
-      ))}
+      <ul className="space-y-4">
+        {data.posts.map((post) => (
+          <li key={post.id}>
+            {user?.id === data.id && <PostMenu post={post} />}
+            <PostCard post={post} />
+          </li>
+        ))}
+      </ul>
     </>
   )
 }
