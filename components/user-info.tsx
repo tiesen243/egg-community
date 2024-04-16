@@ -1,9 +1,11 @@
+import Image from 'next/image'
 import Link from 'next/link'
+import { FollowBtn } from './follow-btn'
 import { Button } from './ui/button'
 import { Card, CardDescription, CardHeader, CardTitle } from './ui/card'
-import { UserAvatar } from './user-avatar'
 
 interface Props {
+  id?: string
   user: {
     id: string
     name: string
@@ -15,10 +17,11 @@ interface Props {
       followers: number
       following: number
     }
+    isFollowing: boolean
   }
 }
 
-export const UserInfo: React.FC<Props> = ({ user }) => (
+export const UserInfo: React.FC<Props> = ({ id, user }) => (
   <Card className="mb-4">
     <CardHeader className="flex-row items-center justify-between gap-8">
       <div className="flex-1 space-y-2">
@@ -38,16 +41,22 @@ export const UserInfo: React.FC<Props> = ({ user }) => (
           </span>
         </p>
 
-        {user.id === user?.id ? (
+        {id === user?.id ? (
           <Button className="w-full" asChild>
             <Link href={`/u/${user.id}/settings`}>Edit Profile</Link>
           </Button>
         ) : (
-          <Button className="w-full">Follow</Button>
+          <FollowBtn id={user.id} isFollowing={user.isFollowing} />
         )}
       </div>
 
-      <UserAvatar user={user} className="size-36" />
+      <Image
+        src={user.image ?? '/og'}
+        alt={user.name}
+        width={150}
+        height={150}
+        className="aspect-square rounded-full"
+      />
     </CardHeader>
   </Card>
 )

@@ -2,12 +2,12 @@ import Elysia from 'elysia'
 import { Scrypt } from 'lucia'
 import { cookies } from 'next/headers'
 
+import { env } from '@/env.mjs'
+import { deleteFile, saveFile } from '@/lib/cloudinary'
 import { db } from '@/prisma'
+import { lucia } from '@/server/auth/lucia'
 import { userModel } from '@/server/models/user.model'
 import { context } from '@/server/plugins'
-import { lucia } from '@/server/auth/lucia'
-import { deleteFile, saveFile } from '@/lib/cloudinary'
-import { env } from '@/env.mjs'
 
 export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
   .use(context)
@@ -41,7 +41,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
             include: {
               author: { select: { id: true, name: true, image: true } },
               _count: { select: { likes: true, comments: true } },
-              likes: isAuth ? { where: { id: query.id } } : false,
+              likes: isAuth ? { where: { userId: query.id } } : false,
             },
             orderBy: { createdAt: 'desc' },
           },
@@ -50,9 +50,9 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
       })
       if (!user) return error(404, { message: 'User not found' })
 
-      const isFollowing = isAuth
-        ? await db.user.findFirst({ where: { id: query.id, followers: { some: { id } } } })
-        : false
+      const isFollowing = await db.user.findFirst({
+        where: { id, followers: { some: { id: query.id } } },
+      })
 
       const posts = user.posts.map((p) => ({
         id: p.id,
@@ -98,7 +98,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
     { body: 'signUp' },
   )
 
-  // [POST] /user/sign-in
+  // [POST] /api/user/sign-in
   .post(
     '/sign-in',
     async ({ body: { email, password }, error }) => {
@@ -117,13 +117,47 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
     { body: 'signIn' },
   )
 
-  // [POST] /user/sign-out
+  // [POST] /api/user/sign-out
   .post('/sign-out', async () => {
     const sessionCookie = lucia.createBlankSessionCookie()
     cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
   })
 
-  // [PATCH] /user/update
+  // [POST] /api/user/follow
+  .post(
+    '/follow',
+    async ({ db, user, body: { id }, error }) => {
+      if (!user) return error(401, { message: 'You are not authorized to follow' })
+      const userToFollow = await db.user.findUnique({ where: { id } })
+      if (!userToFollow) return error(404, { message: 'User not found' })
+
+      let addedFollow = false
+      const followed = await db.user.findFirst({
+        where: { id, followers: { some: { id: user.id } } },
+      })
+      if (followed) {
+        await db.user.update({
+          where: { id },
+          data: { followers: { disconnect: { id: user.id } } },
+        })
+        addedFollow = false
+      } else {
+        await db.user.update({
+          where: { id },
+          data: { followers: { connect: { id: user.id } } },
+        })
+        addedFollow = true
+      }
+
+      return {
+        message: `${addedFollow ? 'Followed' : 'Unfollowed'} ${userToFollow.name}`,
+        addedFollow,
+      }
+    },
+    { body: 'getUser' },
+  )
+
+  // [PATCH] /api/user/update
   .patch(
     '/update',
     async ({ db, user, body, error }) => {
@@ -149,7 +183,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
     { body: 'update' },
   )
 
-  // [PATCH] /user/change-password
+  // [PATCH] /api/user/change-password
   .patch(
     '/change-password',
     async ({ db, user, body, error }) => {
@@ -179,7 +213,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
     { body: 'changePassword' },
   )
 
-  // [PATCH] /user/reset-password
+  // [PATCH] /api/user/reset-password
   .patch(
     '/reset-password',
     async ({ db, body, error }) => {
@@ -209,7 +243,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
     { body: 'resetPassword' },
   )
 
-  // [DELETE] /user/delete
+  // [DELETE] /api/user/delete
   .delete('/delete-account', async ({ db, user, error }) => {
     if (!user) return error(401, { message: 'You are not authorized' })
 

@@ -1,10 +1,10 @@
 'use client'
 
 import { HeartIcon } from 'lucide-react'
+import { toast } from 'sonner'
 
 import { api } from '@/lib/api'
 import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
 
 interface Props {
   id: string

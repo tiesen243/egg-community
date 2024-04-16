@@ -1,12 +1,11 @@
+import { MessageSquareIcon } from 'lucide-react'
 import type { NextPage } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { MessageSquareIcon } from 'lucide-react'
-import Image from 'next/image'
 
 import { LikeBtn } from '@/components/like-btn'
 import { Typography } from '@/components/ui/typography'
-import { UserAvatar } from '@/components/user-avatar'
 import { api } from '@/lib/api'
 import { auth } from '@/server/auth'
 
@@ -22,7 +21,13 @@ const Page: NextPage<Props> = async ({ params: { id } }) => {
   return (
     <>
       <Link href={`/u/${data.author.id}`} className="flex items-center gap-4">
-        <UserAvatar user={data.author} className="size-16" />
+        <Image
+          src={data.author.image ?? '/og'}
+          alt={data.author.name}
+          width={64}
+          height={64}
+          className="aspect-square rounded-full object-cover"
+        />
 
         <div>
           <Typography variant="h3">{data.author.name}</Typography>

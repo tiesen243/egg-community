@@ -10,7 +10,6 @@ interface Props {
   params: { id: string }
 }
 
-export const revalidate = 1
 const Page: NextPage<Props> = async ({ params }) => {
   const { user } = await auth()
 
@@ -19,7 +18,7 @@ const Page: NextPage<Props> = async ({ params }) => {
 
   return (
     <>
-      <UserInfo user={data} />
+      <UserInfo id={user?.id ?? ''} user={data} />
 
       <ul className="space-y-4">
         {data.posts.map((post) => (

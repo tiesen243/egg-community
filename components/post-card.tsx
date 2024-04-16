@@ -11,7 +11,6 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { LikeBtn } from './like-btn'
-import { UserAvatar } from './user-avatar'
 
 interface Props {
   post: {
@@ -30,7 +29,14 @@ export const PostCard: React.FC<Props> = ({ post }) => (
   <Card className="group border-none">
     <div className="absolute left-5 top-0 h-full w-[2px] bg-muted transition-colors ease-linear group-hover:bg-primary" />
     <Link href={`/u/${post.author.id}`} className="absolute inset-0 z-10 flex h-fit gap-2">
-      <UserAvatar user={post.author} className="ring-ring group-hover:ring-2" />
+      <Image
+        src={post.author.image ?? '/og'}
+        alt={post.author.name}
+        width={40}
+        height={40}
+        className="aspect-square rounded-full ring-ring group-hover:ring-2"
+      />
+
       <div>
         <CardTitle>{post.author.name}</CardTitle>
         <CardDescription>{new Date(post.createdAt).toDateString()}</CardDescription>
