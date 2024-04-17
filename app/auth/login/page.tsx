@@ -24,7 +24,7 @@ const Page: NextPage = () => {
 
   return (
     // prettier-ignore
-    <form action={(fd)=>{ trigger(fd) }}>
+    <form action={(fd)=>{ trigger(fd) }} className='container max-w-screen-md space-y-4'>
       <Typography variant="h1">Login</Typography>
       <Typography>
         Welcome back! Please login to continue sharing your thoughts with the community.

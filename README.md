@@ -13,7 +13,7 @@ A simple socials platform for egg antifan built with Next.js, ElysiaJS, and Tail
 - [x] Crete posts
 - [x] Update posts
 - [x] Delete posts
-- [ ] Create comments
+- [x] Create comments
 - [ ] Update comments
 - [ ] Delete comments
 - [x] Likes
@@ -21,6 +21,7 @@ A simple socials platform for egg antifan built with Next.js, ElysiaJS, and Tail
 - [x] Search
 - [x] Follows
 - [x] Following feed
+- [ ] SEO
 
 ## Getting Started
 

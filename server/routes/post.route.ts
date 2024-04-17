@@ -48,6 +48,7 @@ export const postRoute = new Elysia({ name: 'Route.Post', prefix: '/post' })
           author: { select: { id: true, name: true, image: true } },
           _count: { select: { likes: true, comments: true } },
           likes: query.id ? { where: { userId: query.id } } : false,
+          comments: { include: { author: { select: { id: true, name: true, image: true } } } },
         },
       })
 
@@ -62,6 +63,7 @@ export const postRoute = new Elysia({ name: 'Route.Post', prefix: '/post' })
         isLiked: post.likes.length > 0,
         likes: post._count.likes,
         comments: post._count.comments,
+        commentsList: post.comments,
       }
     },
     { query: 'get' },

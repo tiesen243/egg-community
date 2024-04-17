@@ -1,16 +1,19 @@
 'use client'
 
 import { EllipsisIcon } from 'lucide-react'
+import { useState } from 'react'
 
 import { Dialog } from '@/components/ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { DeleteBtn } from './delete-btn'
 import { UpdatePostContent, UpdatePostTrigger } from './update-post'
-import { useState } from 'react'
 
 interface Props {
   post: {
@@ -35,8 +38,13 @@ export const PostMenu: React.FC<Props> = ({ post }) => {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end">
-          <UpdatePostTrigger />
-          <DeleteBtn id={post.id} />
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+
+          <DropdownMenuGroup>
+            <UpdatePostTrigger />
+            <DeleteBtn id={post.id} />
+          </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
 
