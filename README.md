@@ -14,14 +14,14 @@ A simple socials platform for egg antifan built with Next.js, ElysiaJS, and Tail
 - [x] Update posts
 - [x] Delete posts
 - [x] Create comments
-- [ ] Update comments
-- [ ] Delete comments
+- [x] Update comments
+- [x] Delete comments
 - [x] Likes
 - [x] Dislikes
 - [x] Search
 - [x] Follows
 - [x] Following feed
-- [ ] SEO
+- [x] SEO
 
 ## Getting Started
 

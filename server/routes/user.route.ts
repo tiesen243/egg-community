@@ -40,7 +40,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
             include: {
               author: { select: { id: true, name: true, image: true } },
               _count: { select: { likes: true, comments: true } },
-              likes: query.id !== 'undefined' ? { where: { userId: query.id } } : false,
+              likes: query.id ? { where: { userId: query.id } } : false,
             },
             orderBy: { createdAt: 'desc' },
           },
@@ -49,12 +49,11 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
       })
       if (!user) return error(404, { message: 'User not found' })
 
-      const isFollowing =
-        query.id !== 'undefined'
-          ? await db.user.findFirst({
-              where: { id, followers: { some: { id: query.id } } },
-            })
-          : false
+      const isFollowing = query.id
+        ? await db.user.findFirst({
+            where: { id, followers: { some: { id: query.id } } },
+          })
+        : false
 
       const posts = user.posts.map((p) => ({
         id: p.id,
@@ -71,6 +70,28 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
     },
     { query: 'getUser' },
   )
+
+  // [GET] /api/user/:id/following
+  .get('/:id/following', async ({ db, params: { id }, error }) => {
+    const user = await db.user.findUnique({
+      where: { id },
+      include: { following: { select: { id: true, name: true, image: true } } },
+    })
+    if (!user) return error(404, { message: 'User not found' })
+
+    return { name: user.name, users: user.following }
+  })
+
+  // [GET] /api/user/:id/followers
+  .get('/:id/followers', async ({ db, params: { id }, error }) => {
+    const user = await db.user.findUnique({
+      where: { id },
+      include: { followers: { select: { id: true, name: true, image: true } } },
+    })
+    if (!user) return error(404, { message: 'User not found' })
+
+    return { name: user.name, users: user.followers }
+  })
 
   // [POST] /api/user/sign-up
   .post(

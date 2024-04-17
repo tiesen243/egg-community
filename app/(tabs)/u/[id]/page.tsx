@@ -1,4 +1,4 @@
-import type { NextPage } from 'next'
+import type { Metadata, NextPage, ResolvingMetadata } from 'next'
 
 import { PostCard } from '@/components/post-card'
 import { UserInfo } from '@/components/user-info'
@@ -10,11 +10,28 @@ interface Props {
   params: { id: string }
 }
 
-export const revalidate = 1
+export const generateMetadata = async (
+  { params }: Props,
+  parent: ResolvingMetadata,
+): Promise<Metadata> => {
+  const { data, error } = await api.user.info({ id: params.id }).get({ query: {} })
+  if (!data || error) return { title: 'Error' }
+  const previousImages = (await parent).openGraph?.images || []
+
+  return {
+    title: data.name,
+    openGraph: {
+      images: data.image ? [data.image, ...previousImages] : previousImages,
+    },
+  }
+}
+
 const Page: NextPage<Props> = async ({ params }) => {
   const { user } = await auth()
 
-  const { data, error } = await api.user.info({ id: params.id }).get({ query: { id: user?.id } })
+  const { data, error } = await api.user
+    .info({ id: params.id })
+    .get({ query: { id: user?.id ?? '' } })
   if (!data || error) return <div>Error: {error.value.message ?? 'Unknown error'}</div>
 
   return (

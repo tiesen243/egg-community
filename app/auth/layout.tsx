@@ -1,7 +1,16 @@
 import { Typography } from '@/components/ui/typography'
 import { auth } from '@/server/auth'
+import { Metadata } from 'next'
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
+
+export const metadata: Metadata = {
+  title: 'Authorization',
+  description: 'Authorization page for Egg Community',
+  openGraph: {
+    images: '/og?title=Authorization&description=Authorization page for Egg Community',
+  },
+}
 
 const AuthLayout: React.FC<React.PropsWithChildren> = async ({ children }) => {
   const { user } = await auth()

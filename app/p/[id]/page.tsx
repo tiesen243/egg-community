@@ -1,5 +1,5 @@
 import { MessageSquareIcon } from 'lucide-react'
-import type { NextPage } from 'next'
+import type { Metadata, NextPage, ResolvingMetadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -16,10 +16,26 @@ interface Props {
   params: { id: string }
 }
 
+export const generateMetadata = async (
+  { params }: Props,
+  parent: ResolvingMetadata,
+): Promise<Metadata> => {
+  const { data, error } = await api.post['get-one']({ id: params.id }).get({ query: {} })
+  if (!data || error) return { title: 'Error' }
+  const previousImages = (await parent).openGraph?.images || []
+
+  return {
+    title: data?.content.length > 20 ? data?.content.slice(0, 20) + '...' : data?.content,
+    openGraph: {
+      images: data.image ? [data.image, ...previousImages] : previousImages,
+    },
+  }
+}
+
 const Page: NextPage<Props> = async ({ params: { id } }) => {
   const { user } = await auth()
 
-  const { data, error } = await api.post['get-one']({ id }).get({ query: { id: user?.id } })
+  const { data, error } = await api.post['get-one']({ id }).get({ query: { id: user?.id ?? '' } })
 
   if (!data || error)
     return <Typography color="destructive">Error: {error.value.message}</Typography>

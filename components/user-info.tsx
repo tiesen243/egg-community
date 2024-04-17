@@ -33,12 +33,12 @@ export const UserInfo: React.FC<Props> = ({ id, user }) => (
           <span>
             <strong>Post:</strong> {user._count.posts}
           </span>
-          <span>
+          <Link href={`/u/${user.id}/followers`}>
             <strong>Followers:</strong> {user._count.followers}
-          </span>
-          <span>
+          </Link>
+          <Link href={`/u/${user.id}/following`}>
             <strong>Following:</strong> {user._count.following}
-          </span>
+          </Link>
         </p>
 
         {id === user?.id ? (
