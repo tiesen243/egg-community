@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator'
 import { Typography } from '@/components/ui/typography'
 import { api } from '@/lib/api'
 import { auth } from '@/server/auth'
+import { CommentMenu } from '@/components/comment-menu'
 
 interface Props {
   params: { id: string }
@@ -67,9 +68,10 @@ const Page: NextPage<Props> = async ({ params: { id } }) => {
 
         <Separator className="my-4" />
 
-        <ul className="space-y-4">
+        <ul className="mb-20 space-y-4">
           {data.commentsList?.map((c) => (
             <li key={c.id} className="border-b">
+              {c.authorId === user?.id && <CommentMenu id={c.id} content={c.content} />}
               <Link href={`/u/${c.author.id}`} className="flex items-center gap-4">
                 <Image
                   src={c.author.image ?? '/og'}
@@ -87,7 +89,7 @@ const Page: NextPage<Props> = async ({ params: { id } }) => {
                 </p>
               </Link>
 
-              <p className="py-2">{c.content}</p>
+              <p className="break-words py-2">{c.content}</p>
             </li>
           ))}
         </ul>

@@ -32,7 +32,7 @@ export const postModel = new Elysia({ name: 'Model.Post' }).model({
 })
 
 export const createSchema = z.object({
-  content: z.string().min(4, { message: 'Content must be at least 4 characters long' }),
+  content: z.string(),
   image: z.optional(z.instanceof(File)),
 })
 

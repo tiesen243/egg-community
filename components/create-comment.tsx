@@ -27,7 +27,7 @@ export const CreateComment: React.FC<{ postId: string }> = ({ postId }) => {
   return (
     /* prettier-ignore */
     <form ref={formRef} action={(fd)=>{ trigger(fd) }} className="fixed bottom-0 -ml-8 w-full max-w-screen-md md:px-8">
-      <Card>
+      <Card className='rounded-none'>
         <CardHeader className="flex-row items-center gap-2 space-y-0 p-4">
           <FormField name="content" placeholder="Write a comment..." className="flex-1" message={error?.fieldErrors?.content} />
           <Button size="icon" isLoading={isMutating}>
