@@ -16,12 +16,14 @@ export const generateMetadata = async (
 ): Promise<Metadata> => {
   const { data, error } = await api.user.info({ id: params.id }).get({ query: {} })
   if (!data || error) return { title: 'Error' }
-  const previousImages = (await parent).openGraph?.images || []
+  const previousImages = (await parent).openGraph?.images ?? []
 
   return {
     title: data.name,
     openGraph: {
-      images: data.image ? [data.image, ...previousImages] : previousImages,
+      images: data.image
+        ? [data.image, ...previousImages]
+        : [`/og?title=${data.name}&desc=${data.bio ?? ''}`, ...previousImages],
     },
   }
 }

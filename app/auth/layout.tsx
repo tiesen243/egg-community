@@ -1,8 +1,9 @@
-import { Typography } from '@/components/ui/typography'
-import { auth } from '@/server/auth'
-import { Metadata } from 'next'
+import type { Metadata, NextPage } from 'next'
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
+
+import { Typography } from '@/components/ui/typography'
+import { auth } from '@/server/auth'
 
 export const metadata: Metadata = {
   title: 'Authorization',
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
   },
 }
 
-const AuthLayout: React.FC<React.PropsWithChildren> = async ({ children }) => {
+const AuthLayout: NextPage<React.PropsWithChildren> = async ({ children }) => {
   const { user } = await auth()
   if (user) redirect('/')
 

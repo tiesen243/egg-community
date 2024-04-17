@@ -22,12 +22,15 @@ export const generateMetadata = async (
 ): Promise<Metadata> => {
   const { data, error } = await api.post['get-one']({ id: params.id }).get({ query: {} })
   if (!data || error) return { title: 'Error' }
-  const previousImages = (await parent).openGraph?.images || []
+  const previousImages = (await parent).openGraph?.images ?? []
 
   return {
     title: data?.content.length > 20 ? data?.content.slice(0, 20) + '...' : data?.content,
     openGraph: {
-      images: data.image ? [data.image, ...previousImages] : previousImages,
+      images: [
+        `/og?title=${data.author.name}&desc=${data.content ?? ''}&image=${data.image ?? data.author.image ?? ''}`,
+        ...previousImages,
+      ],
     },
   }
 }
