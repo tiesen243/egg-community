@@ -10,6 +10,7 @@ interface Props {
   params: { id: string }
 }
 
+export const revalidate = 1
 const Page: NextPage<Props> = async ({ params }) => {
   const { user } = await auth()
 

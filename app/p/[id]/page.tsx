@@ -2,15 +2,14 @@ import { MessageSquareIcon } from 'lucide-react'
 import type { NextPage } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
 
+import { CreateComment } from '@/components/create-comment'
 import { LikeBtn } from '@/components/like-btn'
+import { PostHeader } from '@/components/post-header'
+import { Separator } from '@/components/ui/separator'
 import { Typography } from '@/components/ui/typography'
 import { api } from '@/lib/api'
 import { auth } from '@/server/auth'
-import { Separator } from '@/components/ui/separator'
-import { CreateComment } from '@/components/create-comment'
-import { PostHeader } from '@/components/post-header'
 
 interface Props {
   params: { id: string }
@@ -18,8 +17,11 @@ interface Props {
 
 const Page: NextPage<Props> = async ({ params: { id } }) => {
   const { user } = await auth()
+
   const { data, error } = await api.post['get-one']({ id }).get({ query: { id: user?.id } })
-  if (!data || error) return notFound()
+
+  if (!data || error)
+    return <Typography color="destructive">Error: {error.value.message}</Typography>
 
   return (
     <>
@@ -90,7 +92,7 @@ const Page: NextPage<Props> = async ({ params: { id } }) => {
           ))}
         </ul>
 
-        <CreateComment postId={data.id} />
+        {user && <CreateComment postId={data.id} />}
       </main>
     </>
   )

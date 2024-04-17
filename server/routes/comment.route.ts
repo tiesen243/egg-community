@@ -6,17 +6,6 @@ export const commentRoute = new Elysia({ prefix: '/comment' })
   .use(context)
   .use(commentModel)
 
-  // [GET] /api/comment/:id
-  .get('/:id', ({ db, params: { id } }) => {
-    const comments = db.comment.findMany({
-      where: { postId: id },
-      include: { author: { select: { id: true, name: true, image: true } } },
-    })
-    if (!comments) return []
-
-    return comments
-  })
-
   // [POST] /api/comment/:id
   .post(
     '/:id',

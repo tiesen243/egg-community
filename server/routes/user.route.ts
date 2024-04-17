@@ -33,7 +33,6 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
   .get(
     '/info/:id',
     async ({ db, params: { id }, query, error }) => {
-      const isAuth = query.id !== 'undefined'
       const user = await db.user.findUnique({
         where: { id },
         include: {
@@ -41,7 +40,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
             include: {
               author: { select: { id: true, name: true, image: true } },
               _count: { select: { likes: true, comments: true } },
-              likes: isAuth ? { where: { userId: query.id } } : false,
+              likes: query.id !== 'undefined' ? { where: { userId: query.id } } : false,
             },
             orderBy: { createdAt: 'desc' },
           },
@@ -50,9 +49,12 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
       })
       if (!user) return error(404, { message: 'User not found' })
 
-      const isFollowing = await db.user.findFirst({
-        where: { id, followers: { some: { id: query.id } } },
-      })
+      const isFollowing =
+        query.id !== 'undefined'
+          ? await db.user.findFirst({
+              where: { id, followers: { some: { id: query.id } } },
+            })
+          : false
 
       const posts = user.posts.map((p) => ({
         id: p.id,
