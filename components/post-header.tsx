@@ -11,7 +11,7 @@ export const PostHeader: React.FC<{ authorName: string }> = ({ authorName }) => 
     <header className="container max-w-screen-md border-b py-2">
       <div className="flex items-center justify-between">
         <ChevronLeftIcon
-          onClick={router.back}
+          onClick={() => router.back()}
           className="cursor-pointer hover:text-muted-foreground"
         />
         <Typography variant="h3">{authorName}</Typography>
