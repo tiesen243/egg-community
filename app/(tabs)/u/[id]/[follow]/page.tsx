@@ -27,7 +27,7 @@ const Page: NextPage<Props> = async ({ params: { id, follow } }) => {
                 alt={user.name}
                 width={40}
                 height={40}
-                className="rounded-full"
+                className="aspect-square rounded-full object-cover"
               />
 
               <CardTitle>{user.name}</CardTitle>
