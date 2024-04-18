@@ -47,10 +47,10 @@ export const PostCard: React.FC<Props> = ({ post }) => (
     </Link>
 
     <Link href={`/p/${post.id}`}>
-      <CardHeader className="line-clamp-2 pb-0 pl-14 pt-14">{post.content}</CardHeader>
+      <CardHeader className="line-clamp-2 pb-0 pl-16 pt-14">{post.content}</CardHeader>
 
       {post.image && (
-        <CardContent className="pl-14 pt-2">
+        <CardContent className="pl-16 pt-2">
           <Image
             src={post.image}
             alt={post.content}
@@ -62,7 +62,7 @@ export const PostCard: React.FC<Props> = ({ post }) => (
       )}
     </Link>
 
-    <CardFooter className={`gap-4 pl-12 ${post.image ? '' : 'pt-2'}`}>
+    <CardFooter className={`gap-4 pl-16 ${post.image ? '' : 'pt-2'}`}>
       <LikeBtn {...post} />
 
       <div className="flex gap-2">
