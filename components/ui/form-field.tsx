@@ -22,11 +22,7 @@ export const FormField = <T extends HTMLInputElement | HTMLTextAreaElement = HTM
 
   return (
     <div className={cn('space-y-1', className)}>
-      {label && (
-        <Label className={message ? 'text-destructive' : ''}>
-          {label} {props.required && '(*)'}
-        </Label>
-      )}
+      {label && <Label className={message ? 'text-destructive' : ''}>{label}</Label>}
       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
       <Comp {...(props as any)} className={message ? 'border-destructive' : ''} />
       <span className="text-sm text-destructive">{message ?? ''}</span>

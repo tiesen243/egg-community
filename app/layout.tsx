@@ -1,4 +1,3 @@
-import type { Metadata, NextPage } from 'next'
 import { Inter } from 'next/font/google'
 
 import { Provider } from '@/components/provider'
@@ -8,9 +7,10 @@ import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
 
-export const metadata: Metadata = siteConfig.meta
+export const metadata = siteConfig.meta
+export const viewport = siteConfig.viewport
 
-const RootLayout: NextPage<React.PropsWithChildren> = ({ children }) => (
+const RootLayout: React.FC<React.PropsWithChildren> = ({ children }) => (
   <html lang="en" suppressHydrationWarning>
     <body className={`font-sans ${inter.variable}`}>
       <Provider>

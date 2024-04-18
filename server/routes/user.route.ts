@@ -267,23 +267,30 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
   )
 
   // [DELETE] /api/user/delete
-  .delete('/delete-account', async ({ db, user, error }) => {
-    if (!user) return error(401, { message: 'You are not authorized' })
+  .delete(
+    '/delete-account',
+    async ({ db, user, body: { password }, error }) => {
+      if (!user) return error(401, { message: 'You are not authorized' })
 
-    const deletedUser = await db.user.delete({ where: { id: user.id } })
-    if (!deletedUser) return error(500, { message: 'Failed to delete user' })
-    if (user.image) await deleteFile(user.image)
+      const isValid = await new Scrypt().verify(user.password, password)
+      if (!isValid) return error(401, { message: 'Password is incorrect' })
 
-    fetch(env.SEND_EMAIL, {
-      method: 'POST',
-      body: JSON.stringify({
-        from: 'Egg Community',
-        to: user.email,
-        reply_to: env.EMAIL,
-        subject: 'Account Deleted',
-        message: `Hello ${user.name}, your account has been successfully deleted!<br>We're sorry to see you go!`,
-      }),
-    })
+      const deletedUser = await db.user.delete({ where: { id: user.id } })
+      if (!deletedUser) return error(500, { message: 'Failed to delete user' })
+      if (user.image) await deleteFile(user.image)
 
-    return { message: 'User deleted successfully' }
-  })
+      fetch(env.SEND_EMAIL, {
+        method: 'POST',
+        body: JSON.stringify({
+          from: 'Egg Community',
+          to: user.email,
+          reply_to: env.EMAIL,
+          subject: 'Account Deleted',
+          message: `Hello ${user.name}, your account has been successfully deleted!<br>We're sorry to see you go!`,
+        }),
+      })
+
+      return { message: 'User deleted successfully' }
+    },
+    { body: 'deleteAccount' },
+  )

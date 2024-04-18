@@ -1,4 +1,5 @@
-import { HomeIcon, RssIcon, SearchIcon } from 'lucide-react'
+import { HomeIcon, RssIcon, SearchIcon, type LucideIcon } from 'lucide-react'
+import type { Metadata, Viewport } from 'next'
 
 export const getBaseUrl = () => {
   if (typeof window !== 'undefined') return window.location.origin
@@ -6,7 +7,13 @@ export const getBaseUrl = () => {
   return `http://localhost:${process.env.PORT ?? 3000}`
 }
 
-export const siteConfig = {
+interface SiteConfig {
+  meta: Metadata
+  viewport: Viewport
+  navs: { label: LucideIcon; href: string }[]
+}
+
+export const siteConfig: SiteConfig = {
   meta: {
     metadataBase: new URL(getBaseUrl()),
     applicationName: 'Egg Community',
@@ -32,6 +39,18 @@ export const siteConfig = {
     icons: { icon: '/favicon.ico', shortcut: '/favicon-16x16.png', apple: '/apple-touch-icon.png' },
     alternates: { canonical: getBaseUrl() },
   },
+
+  viewport: {
+    themeColor: [
+      { media: '(prefers-color-scheme: light)', color: 'hsl(0 0% 100%)' },
+      { media: '(prefers-color-scheme: dark)', color: 'hsl(240 10% 3.9%)' },
+    ],
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
+
   navs: [
     {
       label: HomeIcon,

@@ -32,6 +32,11 @@ const resetPassword = t.Object({
   email: t.String(),
 })
 
+const deleteAccount = t.Object({
+  password: t.String(),
+  confirm: t.String(),
+})
+
 export const userModel = new Elysia({ name: 'Model.User' }).model({
   getUsers,
   getUser,
@@ -40,6 +45,7 @@ export const userModel = new Elysia({ name: 'Model.User' }).model({
   update,
   changePassword,
   resetPassword,
+  deleteAccount,
 })
 
 const passwordSchema = z
@@ -88,4 +94,11 @@ export const changePasswordSchema = z
 
 export const resetPasswordSchema = z.object({
   email: z.string().email(),
+})
+
+export const deleteAccountSchema = z.object({
+  confirm: z.literal('delete my account', {
+    errorMap: () => ({ message: 'Please type "delete my account"' }),
+  }),
+  password: passwordSchema,
 })
