@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@elysiajs/eden": "^1.0.11",
-    "@elysiajs/swagger": "^1.0.3",
     "@lucia-auth/adapter-prisma": "^4.0.1",
     "@prisma/client": "5.12.1",
     "@radix-ui/react-dialog": "^1.0.5",
