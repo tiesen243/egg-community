@@ -1,42 +1,39 @@
 'use client'
+
 import type { NextPage } from 'next'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
 import { FormField } from '@/components/ui/form-field'
-import { Typography } from '@/components/ui/typography'
-import { useMutation } from '@/lib/swr'
-import { resetPasswordSchema } from '@/server/models/user.model'
 import { api } from '@/lib/api'
-import { useRouter } from 'next/navigation'
+import { useMutation } from '@/lib/hooks'
+import { resetPasswordSchema } from '@/lib/validators/user'
 
 const Page: NextPage = () => {
   const router = useRouter()
-  const { trigger, isMutating, error } = useMutation('reset-password', async (_, { arg }) => {
-    const inp = resetPasswordSchema.safeParse(Object.fromEntries(arg.entries()))
-    if (!inp.success) throw inp.error.flatten()
-    const { data, error } = await api.user['reset-password'].patch(inp.data)
-    if (error) throw error.value
-    router.push('/auth/login')
+  const { trigger, isMutating, fieldErrors } = useMutation(async (fd: FormData) => {
+    const inp = resetPasswordSchema.parse(Object.fromEntries(fd))
+    const { data, error } = await api.user['reset-password'].patch(inp)
+    if (error) throw new Error(error.value.message)
+    router.push('/login')
     return data
   })
+
   return (
-    // prettier-ignore
-    <form action={(fd)=>{ trigger(fd) }} className='container max-w-screen-md space-y-4'>
-      <Typography variant="h1">Reset Password</Typography>
-      <Typography>
-        Enter your email address and we will send you a link to reset your password.
-      </Typography>
+    <form action={trigger} className="container max-w-screen-md space-y-4">
+      <h2 className="text-center text-4xl font-bold">Reset Password</h2>
 
-      <FormField label="Email" name="email" type="email" message={error?.fieldErrors?.email} />
+      <FormField label="Email" name="email" type="email" message={fieldErrors?.email?.at(0)} />
 
-      <Typography>
+      <p>
         Remember your password?{' '}
-        <Typography variant="link" href="/auth/login">
+        <Link href="/auth/login" className="underline-offset-4 hover:underline">
           Login
-        </Typography>
-      </Typography>
+        </Link>
+      </p>
 
-      <Button className="w-full" isLoading={isMutating}>
+      <Button type="submit" className="w-full" isLoading={isMutating}>
         Reset Password
       </Button>
     </form>

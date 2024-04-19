@@ -1,6 +1,5 @@
 'use client'
 
-import { useMutation } from '@/lib/swr'
 import { useRouter } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
@@ -15,16 +14,16 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { api } from '@/lib/api'
+import { useMutation } from '@/lib/hooks'
+import { deleteAccountSchema } from '@/lib/validators/user'
 import { FormField } from './ui/form-field'
-import { deleteAccountSchema } from '@/server/models/user.model'
 
 export const DeleteAccount: React.FC = () => {
   const router = useRouter()
-  const { trigger, isMutating, error } = useMutation('delete-account', async (_, { arg }) => {
-    const inp = deleteAccountSchema.safeParse(Object.fromEntries(arg.entries()))
-    if (!inp.success) throw inp.error.flatten()
-    const { data, error } = await api.user['delete-account'].delete(inp.data)
-    if (error) throw error.value
+  const { trigger, isMutating, fieldErrors } = useMutation(async (arg) => {
+    const inp = deleteAccountSchema.parse(Object.fromEntries(arg.entries()))
+    const { data, error } = await api.user['delete-account'].delete(inp)
+    if (error) throw new Error(error.value.message)
     await api.user['sign-out'].post()
     router.push('/')
     router.refresh()
@@ -47,17 +46,12 @@ export const DeleteAccount: React.FC = () => {
           </DialogDescription>
         </DialogHeader>
 
-        <form
-          action={(fd) => {
-            trigger(fd)
-          }}
-          className="space-y-4"
-        >
+        <form action={trigger} className="space-y-4">
           <FormField
             name="confirm"
             label='To verify, type "delete my account" below: '
             placeholder="delete my account"
-            message={error?.fieldErrors?.confirm}
+            message={fieldErrors?.confirm?.at(0)}
           />
 
           <FormField
@@ -65,7 +59,7 @@ export const DeleteAccount: React.FC = () => {
             name="password"
             label="Confirm your password:"
             placeholder="Enter your password"
-            message={error?.fieldErrors?.password}
+            message={fieldErrors?.password?.at(0)}
           />
 
           <DialogFooter className="gird w-full grid-cols-2">

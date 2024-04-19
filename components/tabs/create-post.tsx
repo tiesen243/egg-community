@@ -1,6 +1,8 @@
 'use client'
 
 import { PencilIcon } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -12,25 +14,22 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { FormField } from '@/components/ui/form-field'
-import { useMutation } from '@/lib/swr'
-import { createSchema } from '@/server/models/post.model'
-import { fileToBase64 } from '@/lib/utils'
 import { api } from '@/lib/api'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useMutation } from '@/lib/hooks'
+import { fileToBase64 } from '@/lib/utils'
+import { createSchema } from '@/lib/validators/post'
+import { Textarea } from '../ui/textarea'
 
 export const CreatePost: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false)
   const router = useRouter()
-  const { trigger, isMutating, error } = useMutation('post', async (_, { arg }) => {
-    const inp = createSchema.safeParse(Object.fromEntries(arg.entries()))
-    if (!inp.success) throw inp.error.flatten()
-    const image = String(inp.data.image ? await fileToBase64(inp.data.image) : '')
-    const { data, error } = await api.post.create.post({ content: inp.data.content, image })
-    if (error) throw error.value
-    setOpen(false)
+
+  const { trigger, isMutating, fieldErrors } = useMutation(async (arg) => {
+    const { content, image } = createSchema.parse(Object.fromEntries(arg))
+    const { error } = await api.post.create.post({ content, image: await fileToBase64(image) })
+    if (error) throw new Error(error.value.message)
     router.refresh()
-    return data
+    setOpen(false)
   })
 
   return (
@@ -49,27 +48,27 @@ export const CreatePost: React.FC = () => {
           </DialogDescription>
         </DialogHeader>
 
-        {/* prettier-ignore */}
-        <form action={(fd)=>{ trigger(fd) }} className="my-4 space-y-4">
-            <FormField<HTMLTextAreaElement>
-              name="content"
-              placeholder="What’s on your mind?"
-              multiline
-              message={error?.fieldErrors?.content}
-              disabled={isMutating}
-            />
-            <FormField 
-              name="image" 
-              type="file" 
-              accept="image/*"  
-              message={error?.fieldErrors?.image} 
-              disabled={isMutating}
-            />
+        <form action={trigger} className="my-4 space-y-4">
+          <FormField
+            name="content"
+            message={fieldErrors?.content?.at(0)}
+            disabled={isMutating}
+            asChild
+          >
+            <Textarea />
+          </FormField>
+          <FormField
+            name="image"
+            type="file"
+            accept="image/*"
+            message={fieldErrors?.image?.at(0)}
+            disabled={isMutating}
+          />
 
-            <Button className="w-full" isLoading={isMutating}>
-              Post
-            </Button>
-          </form>
+          <Button className="w-full" isLoading={isMutating}>
+            Post
+          </Button>
+        </form>
       </DialogContent>
     </Dialog>
   )

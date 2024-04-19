@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const fileToBase64 = async (file: File | undefined) => {
-  if (!file) return
+  if (!file) return ''
   const arrayBuffer = await file.arrayBuffer()
   const buffer = new Uint8Array(arrayBuffer)
   const base64File = Buffer.from(buffer).toString('base64')

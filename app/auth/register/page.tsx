@@ -1,53 +1,64 @@
 'use client'
 
 import type { NextPage } from 'next'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
 import { FormField } from '@/components/ui/form-field'
-import { Typography } from '@/components/ui/typography'
 import { api } from '@/lib/api'
-import { useMutation } from '@/lib/swr'
-import { registerSchema } from '@/server/models/user.model'
+import { useMutation } from '@/lib/hooks'
+import { registerSchema } from '@/lib/validators/user'
 
 const Page: NextPage = () => {
   const router = useRouter()
-  const { trigger, isMutating, error } = useMutation('login', async (_, { arg }) => {
-    const inp = registerSchema.safeParse(Object.fromEntries(arg.entries()))
-    if (!inp.success) throw inp.error.flatten()
-    const { data, error } = await api.user['sign-up'].post(inp.data)
-    if (error) throw error.value
+  const { trigger, isMutating, fieldErrors } = useMutation(async (fd: FormData) => {
+    const inp = registerSchema.parse(Object.fromEntries(fd))
+    const { data, error } = await api.user['sign-up'].post(inp)
+    if (error) throw new Error(error.value.message)
     router.push('/auth/login')
     return data
   })
 
   return (
-    // prettier-ignore
-    <form action={(fd)=>{ trigger(fd) }} className='container max-w-screen-md space-y-4'>
-      <Typography variant="h1">Register</Typography>
-      <Typography>Create an account to start sharing your thoughts with the community.</Typography>
+    <form action={trigger} className="container max-w-screen-md space-y-4">
+      <h2 className="text-center text-4xl font-bold">Login</h2>
 
-      <FormField label="Name" name="name" message={error?.fieldErrors?.name} />
-      <FormField label="Email" name="email" type="email" message={error?.fieldErrors?.email} />
+      <FormField
+        label="Name"
+        name="name"
+        message={fieldErrors?.email?.at(0)}
+        disabled={isMutating}
+      />
+      <FormField
+        label="Email"
+        name="email"
+        type="email"
+        message={fieldErrors?.email?.at(0)}
+        disabled={isMutating}
+      />
       <FormField
         label="Password"
         name="password"
         type="password"
-        message={error?.fieldErrors?.password}
+        message={fieldErrors?.password?.at(0)}
+        disabled={isMutating}
       />
       <FormField
         label="Confirm Password"
         name="confirmPassword"
         type="password"
-        message={error?.fieldErrors?.confirmPassword}
+        message={fieldErrors?.confirmPassword?.at(0)}
+        disabled={isMutating}
       />
 
       <p>
         Already have an account?{' '}
-        <Typography variant="link" href="/auth/login">
+        <Link href="/auth/login" className="underline-offset-4 hover:underline">
           Login
-        </Typography>
+        </Link>
       </p>
+
       <Button type="submit" className="w-full" isLoading={isMutating}>
         Register
       </Button>

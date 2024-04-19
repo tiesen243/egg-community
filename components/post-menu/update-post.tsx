@@ -1,4 +1,3 @@
-import { useMutation } from '@/lib/swr'
 import { PencilIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
@@ -8,7 +7,9 @@ import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { FormField } from '@/components/ui/form-field'
 import { api } from '@/lib/api'
 import { fileToBase64 } from '@/lib/utils'
-import { updateSchema } from '@/server/models/post.model'
+import { updateSchema } from '@/lib/validators/post'
+import { useMutation } from '@/lib/hooks'
+import { Textarea } from '../ui/textarea'
 
 export const UpdatePostTrigger: React.FC = () => (
   <DialogTrigger asChild>
@@ -28,17 +29,14 @@ interface Props {
 
 export const UpdatePostContent: React.FC<Props> = ({ post, setOpen }) => {
   const router = useRouter()
-  const { trigger, isMutating, error } = useMutation('post', async (_, { arg }) => {
-    const inp = updateSchema.safeParse(Object.fromEntries(arg.entries()))
-    if (!inp.success) throw inp.error.flatten()
-    const { data, error } = await api.post.update({ id: post.id }).patch({
-      content: inp.data.content,
-      image: await fileToBase64(inp.data.image),
-    })
-    if (error) throw error.value
+  const { trigger, isMutating, fieldErrors } = useMutation(async (arg) => {
+    const { content, image } = updateSchema.parse(Object.fromEntries(arg.entries()))
+    const { error } = await api.post
+      .update({ id: post.id })
+      .patch({ content, image: await fileToBase64(image) })
+    if (error) throw new Error(error.value.message)
     router.refresh()
     setOpen(false)
-    return data
   })
 
   return (
@@ -47,21 +45,22 @@ export const UpdatePostContent: React.FC<Props> = ({ post, setOpen }) => {
         <DialogTitle>Update post</DialogTitle>
       </DialogHeader>
 
-      {/* prettier-ignore */}
-      <form action={(fd)=>{ trigger(fd) }} className="my-4 space-y-4">
-        <FormField<HTMLTextAreaElement>
+      <form action={trigger} className="my-4 space-y-4">
+        <FormField
           name="content"
-          placeholder="What’s on your mind?"
           defaultValue={post.content}
-          multiline
-          message={error?.fieldErrors?.content}
+          message={fieldErrors?.content?.at(0)}
           disabled={isMutating}
-        />
+          asChild
+        >
+          <Textarea />
+        </FormField>
+
         <FormField
           name="image"
           type="file"
           accept="image/*"
-          message={error?.fieldErrors?.image}
+          message={fieldErrors?.image?.at(0)}
           disabled={isMutating}
         />
 

@@ -2,57 +2,60 @@
 
 import type { NextPage } from 'next'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 import { Button } from '@/components/ui/button'
 import { FormField } from '@/components/ui/form-field'
-import { Typography } from '@/components/ui/typography'
 import { api } from '@/lib/api'
-import { loginSchema } from '@/server/models/user.model'
-import { useMutation } from '@/lib/swr'
+import { useMutation } from '@/lib/hooks'
+import { loginSchema } from '@/lib/validators/user'
 
 const Page: NextPage = () => {
   const router = useRouter()
-  const { trigger, isMutating, error } = useMutation('login', async (_, { arg }) => {
-    const inp = loginSchema.safeParse(Object.fromEntries(arg.entries()))
-    if (!inp.success) throw inp.error.flatten()
-    const { data, error } = await api.user['sign-in'].post(inp.data)
-    if (error) throw error.value
+  const { trigger, isMutating, fieldErrors } = useMutation(async (fd: FormData) => {
+    const inp = loginSchema.parse(Object.fromEntries(fd))
+    const { data, error } = await api.user['sign-in'].post(inp)
+    if (error) throw new Error(error.value.message)
     router.push('/')
     router.refresh()
     return data
   })
 
   return (
-    // prettier-ignore
-    <form action={(fd)=>{ trigger(fd) }} className='container max-w-screen-md space-y-4'>
-      <Typography variant="h1">Login</Typography>
-      <Typography>
-        Welcome back! Please login to continue sharing your thoughts with the community.
-      </Typography>
+    <form action={trigger} className="container max-w-screen-md space-y-4">
+      <h2 className="text-center text-4xl font-bold">Login</h2>
 
-      <FormField label="Email" name="email" type="email" message={error?.fieldErrors?.email} />
+      <FormField
+        label="Email"
+        name="email"
+        type="email"
+        message={fieldErrors?.email?.at(0)}
+        disabled={isMutating}
+      />
       <FormField
         label="Password"
         name="password"
         type="password"
-        message={error?.fieldErrors?.password}
+        message={fieldErrors?.password?.at(0)}
+        disabled={isMutating}
       />
 
-      <div className="flex flex-col justify-between gap-2 md:flex-row">
+      <div className="flex flex-col md:flex-row md:justify-between">
         <p>
           Don&apos;t have an account?{' '}
-          <Typography variant="link" href="/auth/register">
+          <Link href="/auth/register" className="underline-offset-4 hover:underline">
             Register
-          </Typography>
+          </Link>
         </p>
 
         <p>
           Forgot your password?{' '}
-          <Typography variant="link" href="/auth/forgot-password">
-            Reset
-          </Typography>
+          <Link href="/auth/forgot-password" className="underline-offset-4 hover:underline">
+            Reset password
+          </Link>
         </p>
       </div>
+
       <Button type="submit" className="w-full" isLoading={isMutating}>
         Login
       </Button>

@@ -5,10 +5,10 @@ import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { FormField } from '@/components/ui/form-field'
-import { fileToBase64, previewFile } from '@/lib/utils'
-import { useMutation } from '@/lib/swr'
-import { updateSchema } from '@/server/models/user.model'
 import { api } from '@/lib/api'
+import { useMutation } from '@/lib/hooks'
+import { fileToBase64, previewFile } from '@/lib/utils'
+import { updateSchema } from '@/lib/validators/user'
 
 interface Props {
   user: {
@@ -19,32 +19,30 @@ interface Props {
 }
 export const UpdateProfileForm: React.FC<Props> = ({ user }) => {
   const [preview, setPreview] = useState<string | null>(null)
-  const { trigger, isMutating, error } = useMutation('user', async (_, { arg }) => {
-    const inp = updateSchema.safeParse(Object.fromEntries(arg.entries()))
-    if (!inp.success) throw inp.error.flatten()
+  const { trigger, isMutating, fieldErrors } = useMutation(async (arg) => {
+    const { name, bio, avatar } = updateSchema.parse(Object.fromEntries(arg.entries()))
     const { data, error } = await api.user.update.patch({
-      ...inp.data,
-      avatar: await fileToBase64(inp.data.avatar),
+      name,
+      bio,
+      avatar: await fileToBase64(avatar),
     })
     if (error) throw error.value
     return data
   })
 
   return (
-    // prettier-ignore
-    <form action={(fd)=>{ trigger(fd) }} className="space-y-4">
+    <form action={trigger} className="space-y-4">
       <FormField
         label="Name"
         name="name"
         defaultValue={user.name}
-        message={error?.fieldErrors?.name}
+        message={fieldErrors?.name?.at(0)}
       />
       <FormField
         label="Bio"
         name="bio"
         defaultValue={user.bio ?? ''}
-        message={error?.fieldErrors?.bio}
-        multiline
+        message={fieldErrors?.bio?.at(0)}
       />
       <FormField
         label="Image"
@@ -52,7 +50,7 @@ export const UpdateProfileForm: React.FC<Props> = ({ user }) => {
         type="file"
         accept="image/*"
         onChange={(e) => previewFile(e.target.files?.[0], setPreview)}
-        message={error?.fieldErrors?.avatar}
+        message={fieldErrors?.avatar?.at(0)}
       />
 
       {preview && (

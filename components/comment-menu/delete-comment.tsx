@@ -1,8 +1,8 @@
 import { Trash2Icon } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { api } from '@/lib/api'
-import { useRouter } from 'next/navigation'
 
 export const DeleteComment: React.FC<{ id: string }> = ({ id }) => {
   const router = useRouter()

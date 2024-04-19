@@ -1,5 +1,4 @@
 import Elysia, { t } from 'elysia'
-import { z } from 'zod'
 
 const get = t.Partial(
   t.Object({
@@ -29,14 +28,4 @@ export const postModel = new Elysia({ name: 'Model.Post' }).model({
   createPost,
   updatePost,
   deletePost,
-})
-
-export const createSchema = z.object({
-  content: z.string(),
-  image: z.optional(z.instanceof(File)),
-})
-
-export const updateSchema = z.object({
-  content: z.optional(z.string().min(4, { message: 'Content must be at least 4 characters long' })),
-  image: z.optional(z.instanceof(File)),
 })

@@ -2,7 +2,7 @@
 
 import { ChevronLeftIcon } from 'lucide-react'
 
-import { Typography } from './ui/typography'
+import { Typography } from '@/components/ui/typography'
 import { useRouter } from 'next/navigation'
 
 export const PostHeader: React.FC<{ authorName: string }> = ({ authorName }) => {

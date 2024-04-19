@@ -1,6 +1,7 @@
 import Image from 'next/image'
-import { Card, CardHeader, CardTitle } from './ui/card'
 import Link from 'next/link'
+
+import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface Props {
   user: {

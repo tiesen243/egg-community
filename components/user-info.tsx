@@ -1,8 +1,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
+
+import { Button } from '@/components/ui/button'
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { FollowBtn } from './follow-btn'
-import { Button } from './ui/button'
-import { Card, CardDescription, CardHeader, CardTitle } from './ui/card'
 
 interface Props {
   id?: string
