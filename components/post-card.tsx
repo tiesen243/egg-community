@@ -28,9 +28,10 @@ interface Props {
 export const PostCard: React.FC<Props> = ({ post }) => (
   <Card className="group border-none">
     <div className="absolute left-5 top-0 h-full w-[2px] bg-muted transition-colors ease-linear group-hover:bg-primary" />
+
     <Link
       href={`/u/${post.author.id}`}
-      className="absolute inset-0 z-10 flex h-fit items-center gap-4"
+      className="absolute inset-0 z-10 flex h-fit w-fit items-center gap-4"
     >
       <Image
         src={post.author.image ?? '/og'}

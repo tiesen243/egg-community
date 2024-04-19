@@ -11,6 +11,7 @@ import { Typography } from '@/components/ui/typography'
 import { api } from '@/lib/api'
 import { auth } from '@/server/auth'
 import { CommentMenu } from '@/components/comment-menu'
+import { PostMenu } from '@/components/post-menu'
 
 interface Props {
   params: { id: string }
@@ -47,6 +48,12 @@ const Page: NextPage<Props> = async ({ params: { id } }) => {
     <>
       <PostHeader authorName={data.author.name} />
       <main className="container max-w-screen-md">
+        {user?.id === data.author.id && (
+          <div className="absolute right-0 top-0">
+            <PostMenu post={data} />
+          </div>
+        )}
+
         <Link href={`/u/${data.author.id}`} className="flex items-center gap-4">
           <Image
             src={data.author.image ?? '/og'}
