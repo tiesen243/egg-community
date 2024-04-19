@@ -18,7 +18,7 @@ const Page: NextPage = () => {
     if (error) throw new Error(error.value.message)
     router.push('/')
     router.refresh()
-    return data
+    return data.message
   })
 
   return (

@@ -18,7 +18,7 @@ export const ChangePasswordForm: React.FC = () => {
     await api.user['sign-out'].post()
     router.push('/')
     router.refresh()
-    return data
+    return data.message
   })
 
   return (

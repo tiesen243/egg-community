@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { auth } from '@/server/auth'
-import { Tabs } from '../tabs'
+import { Tabs } from '@/components/tabs'
 import { Menu } from './menu'
 
 export const Header: React.FC = async () => {

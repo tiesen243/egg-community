@@ -5,11 +5,11 @@ import { Button } from '@/components/ui/button'
 import { DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { FormField } from '@/components/ui/form-field'
+import { Textarea } from '@/components/ui/textarea'
 import { api } from '@/lib/api'
+import { useMutation } from '@/lib/hooks'
 import { fileToBase64 } from '@/lib/utils'
 import { updateSchema } from '@/lib/validators/post'
-import { useMutation } from '@/lib/hooks'
-import { Textarea } from '../ui/textarea'
 
 export const UpdatePostTrigger: React.FC = () => (
   <DialogTrigger asChild>

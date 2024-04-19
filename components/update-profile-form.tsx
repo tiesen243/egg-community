@@ -27,7 +27,7 @@ export const UpdateProfileForm: React.FC<Props> = ({ user }) => {
       avatar: await fileToBase64(avatar),
     })
     if (error) throw error.value
-    return data
+    return data.message
   })
 
   return (

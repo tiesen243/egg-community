@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { MenuIcon, SettingsIcon } from 'lucide-react'
 
 import {
   DropdownMenu,
@@ -9,8 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { MenuIcon, SettingsIcon } from 'lucide-react'
-import { Typography } from '../ui/typography'
+import { Typography } from '@/components/ui/typography'
 import { LogOutBtn } from './log-out-btn'
 import { ThemeBtn } from './theme-btn'
 

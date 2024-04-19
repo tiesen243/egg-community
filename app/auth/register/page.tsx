@@ -17,7 +17,7 @@ const Page: NextPage = () => {
     const { data, error } = await api.user['sign-up'].post(inp)
     if (error) throw new Error(error.value.message)
     router.push('/auth/login')
-    return data
+    return data.message
   })
 
   return (

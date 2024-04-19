@@ -3,23 +3,28 @@ import { toast } from 'sonner'
 import { ZodError } from 'zod'
 
 export const useMutation = <TData = unknown>(fetcher: (arg: FormData) => Promise<TData>) => {
-  const [isMutating, setIsMutating] = useState(false)
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string[] | undefined>>({})
+  const [state, setState] = useState<{
+    fieldErrors: Record<string, string[] | undefined>
+    isMutating: boolean
+  }>({
+    fieldErrors: {},
+    isMutating: false,
+  })
 
   const trigger = useCallback(
     (arg: FormData) => {
       const fetch = async (arg: FormData) => {
-        setIsMutating(true)
-        setFieldErrors({})
+        setState((prev) => ({ ...prev, isMutating: true }))
 
         try {
           const data = await fetcher(arg)
-          if (data) toast.success(String(data?.message))
+          if (data) toast.success(String(data))
         } catch (e) {
-          if (e instanceof ZodError) setFieldErrors(e.flatten().fieldErrors)
+          if (e instanceof ZodError)
+            setState((prev) => ({ ...prev, fieldErrors: e.flatten().fieldErrors }))
           else if (e instanceof Error) toast.error(e.message)
         } finally {
-          setIsMutating(false)
+          setState((prev) => ({ ...prev, isMutating: false }))
         }
       }
 
@@ -28,5 +33,9 @@ export const useMutation = <TData = unknown>(fetcher: (arg: FormData) => Promise
     [fetcher],
   )
 
-  return { trigger, isMutating, fieldErrors }
+  return {
+    trigger,
+    fieldErrors: state.fieldErrors,
+    isMutating: state.isMutating,
+  }
 }

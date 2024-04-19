@@ -17,7 +17,7 @@ const Page: NextPage = () => {
     const { data, error } = await api.user['reset-password'].patch(inp)
     if (error) throw new Error(error.value.message)
     router.push('/login')
-    return data
+    return data.message
   })
 
   return (

@@ -14,11 +14,11 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { FormField } from '@/components/ui/form-field'
+import { Textarea } from '@/components/ui/textarea'
 import { api } from '@/lib/api'
 import { useMutation } from '@/lib/hooks'
 import { fileToBase64 } from '@/lib/utils'
 import { createSchema } from '@/lib/validators/post'
-import { Textarea } from '../ui/textarea'
 
 export const CreatePost: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false)
