@@ -9,7 +9,10 @@ const Page: NextPage = async () => {
   const { user } = await auth()
   if (!user) redirect('/')
 
-  const { data, error } = await api.post['get-by-following'].get({ query: { id: user.id } })
+  const { data, error } = await api.post['get-by-following'].get({
+    query: { id: user.id },
+    fetch: { next: { tags: ['posts'] } },
+  })
   if (error) return <div>{error.value.message}</div>
 
   return data.map((post) => <PostCard key={post.id} post={post} />)
