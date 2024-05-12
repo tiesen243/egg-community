@@ -15,7 +15,7 @@ import { revalidate } from '@/lib/revalidate'
 import { fileToBase64 } from '@/lib/utils'
 
 const schema = z.object({
-  content: z.string().min(1).max(1000),
+  content: z.string(),
   image: z.optional(z.instanceof(File)),
 })
 
