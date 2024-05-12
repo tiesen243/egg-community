@@ -1,5 +1,5 @@
 import { auth } from '@/server/auth'
-import { Tabs } from './tabs'
+import { Tabs } from '@/components/tabs'
 
 export const Footer: React.FC = async () => {
   const { user } = await auth()

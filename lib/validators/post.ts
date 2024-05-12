@@ -1,11 +1,7 @@
 import { z } from 'zod'
 
-export const createSchema = z.object({
-  content: z.string(),
+export const postSchema = z.object({
+  content: z.string().min(4, { message: 'Content must be at least 4 characters long' }),
   image: z.optional(z.instanceof(File)),
 })
-
-export const updateSchema = z.object({
-  content: z.optional(z.string().min(4, { message: 'Content must be at least 4 characters long' })),
-  image: z.optional(z.instanceof(File)),
-})
+export type PostSchema = z.infer<typeof postSchema>

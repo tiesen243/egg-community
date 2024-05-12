@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { LikeBtn } from './like-btn'
+import { LikeBtn } from '@/components/like-btn'
 
 interface Props {
   post: {

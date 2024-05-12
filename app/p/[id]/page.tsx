@@ -39,7 +39,10 @@ export const generateMetadata = async (
 const Page: NextPage<Props> = async ({ params: { id } }) => {
   const { user } = await auth()
 
-  const { data, error } = await api.post['get-one']({ id }).get({ query: { id: user?.id ?? '' } })
+  const { data, error } = await api.post['get-one']({ id }).get({
+    query: { id: user?.id ?? '' },
+    fetch: { next: { tags: ['posts'] } },
+  })
 
   if (!data || error)
     return <Typography color="destructive">Error: {error.value.message}</Typography>

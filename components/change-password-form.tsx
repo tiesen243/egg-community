@@ -1,41 +1,45 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
-import { FormField } from '@/components/ui/form-field'
+import { Form, TextField } from '@/components/ui/form'
 import { api } from '@/lib/api'
-import { useMutation } from '@/lib/hooks'
-import { changePasswordSchema } from '@/lib/validators/user'
+import { changePasswordSchema, type ChangePasswordSchema } from '@/lib/validators/user'
 
 export const ChangePasswordForm: React.FC = () => {
   const router = useRouter()
-
-  const { trigger, isMutating, fieldErrors } = useMutation(async (arg) => {
-    const inp = changePasswordSchema.parse(Object.fromEntries(arg.entries()))
-    const { data, error } = await api.user['change-password'].patch(inp)
-    if (error) throw new Error(error.value.message)
+  const form = useForm<ChangePasswordSchema>({ resolver: zodResolver(changePasswordSchema) })
+  const handleSubmit = form.handleSubmit(async (formData: ChangePasswordSchema) => {
+    const { data, error } = await api.user['change-password'].patch(formData)
+    if (error) {
+      toast.error(error.value.message)
+      return
+    }
+    toast.success(data.message, {
+      description: 'You will be redirected to the login page',
+    })
     await api.user['sign-out'].post()
-    router.push('/')
+    router.push('/login')
     router.refresh()
-    return data.message
   })
+  const isPending = form.formState.isSubmitting
 
   return (
-    <form action={trigger} className="space-y-4">
-      {fields.map((field) => (
-        <FormField
-          key={field.name}
-          {...field}
-          type="password"
-          message={fieldErrors?.[field.name]?.at(0)}
-        />
-      ))}
+    <Form {...form}>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {fields.map((field) => (
+          <TextField key={field.name} control={form.control} {...field} />
+        ))}
 
-      <Button className="w-full" isLoading={isMutating}>
-        Change Password
-      </Button>
-    </form>
+        <Button className="w-full" isLoading={isPending}>
+          Change Password
+        </Button>
+      </form>
+    </Form>
   )
 }
 
@@ -43,13 +47,19 @@ const fields = [
   {
     name: 'oldPassword',
     label: 'Old Password',
+    type: 'password',
+    placeholder: 'Abcd#12345',
   },
   {
     name: 'newPassword',
     label: 'New Password',
+    type: 'password',
+    placeholder: 'Abcd#12345',
   },
   {
     name: 'confirmNewPassword',
     label: 'Confirm New Password',
+    type: 'password',
+    placeholder: 'Abcd#12345',
   },
 ]

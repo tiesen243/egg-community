@@ -1,14 +1,16 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
+import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
-import { FormField } from '@/components/ui/form-field'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { api } from '@/lib/api'
-import { useMutation } from '@/lib/hooks'
-import { fileToBase64, previewFile } from '@/lib/utils'
-import { updateSchema } from '@/lib/validators/user'
+import { revalidate } from '@/lib/revalidate'
+import { fileToBase64 } from '@/lib/utils'
 
 interface Props {
   user: {
@@ -19,39 +21,48 @@ interface Props {
 }
 export const UpdateProfileForm: React.FC<Props> = ({ user }) => {
   const [preview, setPreview] = useState<string | null>(null)
-  const { trigger, isMutating, fieldErrors } = useMutation(async (arg) => {
-    const { name, bio, avatar } = updateSchema.parse(Object.fromEntries(arg.entries()))
-    const { data, error } = await api.user.update.patch({
-      name,
-      bio,
-      avatar: await fileToBase64(avatar),
+  const [isPending, startTransition] = useTransition()
+  const handleSubmit = (formData: FormData) =>
+    startTransition(async () => {
+      const { data, error } = await api.user.update.patch({
+        name: String(formData.get('name')),
+        bio: String(formData.get('bio')),
+        avatar: await fileToBase64(formData.get('avatar') as File),
+      })
+      if (error) {
+        toast.error(error.value.message)
+        return
+      }
+      toast.success(data.message)
+      revalidate('users')
     })
-    if (error) throw error.value
-    return data.message
-  })
 
   return (
-    <form action={trigger} className="space-y-4">
-      <FormField
-        label="Name"
-        name="name"
-        defaultValue={user.name}
-        message={fieldErrors?.name?.at(0)}
-      />
-      <FormField
-        label="Bio"
-        name="bio"
-        defaultValue={user.bio ?? ''}
-        message={fieldErrors?.bio?.at(0)}
-      />
-      <FormField
-        label="Image"
-        name="avatar"
-        type="file"
-        accept="image/*"
-        onChange={(e) => previewFile(e.target.files?.[0], setPreview)}
-        message={fieldErrors?.avatar?.at(0)}
-      />
+    <form action={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="name">Name</Label>
+        <Input name="name" defaultValue={user.name} disabled={isPending} />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="bio">Bio</Label>
+        <Textarea disabled={isPending} defaultValue={user.bio ?? ''} />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="avatar">Avatar</Label>
+        <Input
+          type="file"
+          name="avatar"
+          accept="image/*"
+          onChange={async (e) => {
+            const file = e.target.files?.[0]
+            if (!file) return
+            const base64 = await fileToBase64(file)
+            setPreview(base64)
+          }}
+        />
+      </div>
 
       {preview && (
         <Image
@@ -63,7 +74,7 @@ export const UpdateProfileForm: React.FC<Props> = ({ user }) => {
         />
       )}
 
-      <Button className="w-full" isLoading={isMutating}>
+      <Button className="w-full" isLoading={isPending}>
         Update
       </Button>
     </form>

@@ -1,75 +1,69 @@
 'use client'
 
 import { PencilIcon } from 'lucide-react'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useTransition } from 'react'
+import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
-import { FormField } from '@/components/ui/form-field'
+import * as dialog from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
-import { api } from '@/lib/api'
-import { useMutation } from '@/lib/hooks'
 import { fileToBase64 } from '@/lib/utils'
-import { createSchema } from '@/lib/validators/post'
+import { api } from '@/lib/api'
+import { revalidate } from '@/lib/revalidate'
+import { Label } from '../ui/label'
+import { Input } from '../ui/input'
 
 export const CreatePost: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false)
-  const router = useRouter()
+  const [isPending, startTransition] = useTransition()
 
-  const { trigger, isMutating, fieldErrors } = useMutation(async (arg) => {
-    const { content, image } = createSchema.parse(Object.fromEntries(arg))
-    const { error } = await api.post.create.post({ content, image: await fileToBase64(image) })
-    if (error) throw new Error(error.value.message)
-    router.refresh()
-    setOpen(false)
-  })
+  const action = (formData: FormData) =>
+    startTransition(async () => {
+      const inp = {
+        content: String(formData.get('content')),
+        image: await fileToBase64(formData.get('image') as File),
+      }
+      const { error } = await api.post.create.post(inp)
+      if (error) {
+        toast.error(error.value.message)
+        return
+      }
+      revalidate('posts')
+      setOpen(false)
+    })
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+    <dialog.Dialog open={open} onOpenChange={setOpen}>
+      <dialog.DialogTrigger asChild>
         <Button variant="ghost" className="flex-1 text-muted-foreground">
           <PencilIcon />
         </Button>
-      </DialogTrigger>
+      </dialog.DialogTrigger>
 
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Create a new post</DialogTitle>
-          <DialogDescription>
+      <dialog.DialogContent>
+        <dialog.DialogHeader>
+          <dialog.DialogTitle>Create a new post</dialog.DialogTitle>
+          <dialog.DialogDescription>
             Start a new discussion or ask a question. Share what’s on your mind.
-          </DialogDescription>
-        </DialogHeader>
+          </dialog.DialogDescription>
+        </dialog.DialogHeader>
 
-        <form action={trigger} className="my-4 space-y-4">
-          <FormField
-            name="content"
-            message={fieldErrors?.content?.at(0)}
-            disabled={isMutating}
-            asChild
-          >
-            <Textarea />
-          </FormField>
-          <FormField
-            name="image"
-            type="file"
-            accept="image/*"
-            message={fieldErrors?.image?.at(0)}
-            disabled={isMutating}
-          />
+        <form action={action} className="my-4 space-y-4">
+          <div>
+            <Label htmlFor="content">Content</Label>
+            <Textarea name="content" placeholder="What's on your mind?" />
+          </div>
 
-          <Button className="w-full" isLoading={isMutating}>
+          <div className="space-y-2">
+            <Label htmlFor="image">Image</Label>
+            <Input type="file" name="image" accept="image/*" />
+          </div>
+
+          <Button className="w-full" isLoading={isPending}>
             Post
           </Button>
         </form>
-      </DialogContent>
-    </Dialog>
+      </dialog.DialogContent>
+    </dialog.Dialog>
   )
 }

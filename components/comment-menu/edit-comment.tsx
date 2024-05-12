@@ -1,11 +1,12 @@
-import { useRouter } from 'next/navigation'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
 
 import { Button } from '@/components/ui/button'
 import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { FormField } from '@/components/ui/form-field'
+import { Form, TextField } from '@/components/ui/form'
 import { api } from '@/lib/api'
-import { commentSchema } from '@/lib/validators/comment'
-import { useMutation } from '@/lib/hooks'
+import { revalidate } from '@/lib/revalidate'
+import { commentSchema, type CommentSchema } from '@/lib/validators/comment'
 
 interface Props {
   id: string
@@ -13,14 +14,13 @@ interface Props {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 export const EditComment: React.FC<Props> = (props) => {
-  const router = useRouter()
-  const { trigger, isMutating } = useMutation(async (arg) => {
-    const inp = commentSchema.parse(Object.fromEntries(arg.entries()))
-    const { error } = await api.comment({ id: props.id }).patch(inp)
-    if (error) throw error.value
+  const form = useForm<CommentSchema>({ resolver: zodResolver(commentSchema) })
+  const handleSubmit = form.handleSubmit(async (formData: CommentSchema) => {
+    await api.comment({ id: props.id }).patch(formData)
     props.setOpen(false)
-    router.refresh()
+    revalidate('posts')
   })
+  const isPending = form.formState.isSubmitting
 
   return (
     <DialogContent>
@@ -28,18 +28,22 @@ export const EditComment: React.FC<Props> = (props) => {
         <DialogTitle>Edit your comment</DialogTitle>
       </DialogHeader>
 
-      <form action={trigger} className="space-y-4">
-        <FormField
-          name="content"
-          label="Content"
-          defaultValue={props.content}
-          disabled={isMutating}
-        />
+      <Form {...form}>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <TextField
+            control={form.control}
+            name="content"
+            label="Content"
+            defaultValue={props.content}
+            placeholder="What's on your mind?"
+            disabled={isPending}
+          />
 
-        <DialogFooter>
-          <Button isLoading={isMutating}>Save</Button>
-        </DialogFooter>
-      </form>
+          <DialogFooter>
+            <Button isLoading={isPending}>Save</Button>
+          </DialogFooter>
+        </form>
+      </Form>
     </DialogContent>
   )
 }

@@ -21,17 +21,20 @@ export const registerSchema = z
     message: 'Passwords do not match',
     path: ['confirmPassword'],
   })
+export type RegisterSchema = z.infer<typeof registerSchema>
 
 export const loginSchema = z.object({
   email: z.string().email({ message: 'Email is invalid' }),
   password: passwordSchema,
 })
+export type LoginSchema = z.infer<typeof loginSchema>
 
 export const updateSchema = z.object({
   name: z.optional(z.string().min(4, { message: 'Name must be at least 4 characters long' })),
   bio: z.optional(z.string().min(4, { message: 'Bio must be at least 4 characters long' })),
   avatar: z.optional(z.instanceof(File)),
 })
+export type UpdateSchema = z.infer<typeof updateSchema>
 
 export const changePasswordSchema = z
   .object({
@@ -43,10 +46,12 @@ export const changePasswordSchema = z
     message: 'Passwords do not match',
     path: ['confirmNewPassword'],
   })
+export type ChangePasswordSchema = z.infer<typeof changePasswordSchema>
 
 export const resetPasswordSchema = z.object({
   email: z.string().email(),
 })
+export type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>
 
 export const deleteAccountSchema = z.object({
   confirm: z.literal('delete my account', {
@@ -54,3 +59,4 @@ export const deleteAccountSchema = z.object({
   }),
   password: passwordSchema,
 })
+export type DeleteAccountSchema = z.infer<typeof deleteAccountSchema>

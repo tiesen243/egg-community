@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { FollowBtn } from './follow-btn'
+import { FollowBtn } from '@/components/follow-btn'
 
 interface Props {
   id?: string

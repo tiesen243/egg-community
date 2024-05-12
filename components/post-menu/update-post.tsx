@@ -1,15 +1,16 @@
+import { fileToBase64 } from '@/lib/utils'
 import { PencilIcon } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useTransition } from 'react'
+import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
-import { FormField } from '@/components/ui/form-field'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { api } from '@/lib/api'
-import { useMutation } from '@/lib/hooks'
-import { fileToBase64 } from '@/lib/utils'
-import { updateSchema } from '@/lib/validators/post'
+import { revalidate } from '@/lib/revalidate'
 
 export const UpdatePostTrigger: React.FC = () => (
   <DialogTrigger asChild>
@@ -28,16 +29,23 @@ interface Props {
 }
 
 export const UpdatePostContent: React.FC<Props> = ({ post, setOpen }) => {
-  const router = useRouter()
-  const { trigger, isMutating, fieldErrors } = useMutation(async (arg) => {
-    const { content, image } = updateSchema.parse(Object.fromEntries(arg.entries()))
-    const { error } = await api.post
-      .update({ id: post.id })
-      .patch({ content, image: await fileToBase64(image) })
-    if (error) throw new Error(error.value.message)
-    router.refresh()
-    setOpen(false)
-  })
+  const [isPending, startTransition] = useTransition()
+
+  const handleSubmit = (formData: FormData) =>
+    startTransition(async () => {
+      const inp = {
+        content: String(formData.get('content')),
+        image: await fileToBase64(formData.get('image') as File),
+      }
+      const { error } = await api.post.update({ id: post.id }).patch(inp)
+      if (error) {
+        toast.error(error.value.message)
+        return
+      }
+
+      revalidate('posts')
+      setOpen(false)
+    })
 
   return (
     <DialogContent>
@@ -45,26 +53,18 @@ export const UpdatePostContent: React.FC<Props> = ({ post, setOpen }) => {
         <DialogTitle>Update post</DialogTitle>
       </DialogHeader>
 
-      <form action={trigger} className="my-4 space-y-4">
-        <FormField
-          name="content"
-          defaultValue={post.content}
-          message={fieldErrors?.content?.at(0)}
-          disabled={isMutating}
-          asChild
-        >
-          <Textarea />
-        </FormField>
+      <form action={handleSubmit} className="my-4 space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="content">Content</Label>
+          <Textarea name="content" defaultValue={post.content} />
+        </div>
 
-        <FormField
-          name="image"
-          type="file"
-          accept="image/*"
-          message={fieldErrors?.image?.at(0)}
-          disabled={isMutating}
-        />
+        <div className="space-y-2">
+          <Label htmlFor="image">Image</Label>
+          <Input type="file" name="image" accept="image/*" />
+        </div>
 
-        <Button className="w-full" isLoading={isMutating}>
+        <Button className="w-full" isLoading={isPending}>
           Save changes
         </Button>
       </form>

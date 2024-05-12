@@ -17,7 +17,7 @@ import { ThemeBtn } from './theme-btn'
 export const Menu: React.FC<{ id?: string; name?: string }> = async ({ id, name }) => {
   if (!id || !name)
     return (
-      <Typography variant="link" href="/auth/login">
+      <Typography variant="link" href="/login">
         Login
       </Typography>
     )

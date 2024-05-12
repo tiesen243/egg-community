@@ -1,12 +1,12 @@
 'use client'
 
-import { usePathname, useRouter } from 'next/navigation'
 import { ChevronLeft, UserIcon } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
 
+import { CreatePost } from '@/components/tabs/create-post'
 import { Button } from '@/components/ui/button'
 import { siteConfig } from '@/lib/site'
 import { cn } from '@/lib/utils'
-import { CreatePost } from './create-post'
 
 export const Tabs: React.FC<{ className?: string; userId: string }> = ({ className, userId }) => {
   const pathName = usePathname()
