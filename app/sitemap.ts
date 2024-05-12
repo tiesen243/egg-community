@@ -9,17 +9,12 @@ interface Route {
 
 const baseUrl = getBaseUrl()
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const routesMap = [
-    '',
-    'auth/login',
-    'auth/register',
-    'auth/forgot-password',
-    'following',
-    'search',
-  ].map((route) => ({
-    url: `${baseUrl}/${route}`,
-    lastModified: new Date().toISOString(),
-  }))
+  const routesMap = ['', 'login', 'register', 'forgot-password', 'following', 'search'].map(
+    (route) => ({
+      url: `${baseUrl}/${route}`,
+      lastModified: new Date().toISOString(),
+    }),
+  )
 
   const userRoute = await db.user
     .findMany({ select: { id: true, updatedAt: true } })
