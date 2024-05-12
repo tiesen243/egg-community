@@ -16,12 +16,12 @@ const fields = [
     name: 'confirm',
     label: 'To verify, type "delete my account" below: ',
     placeholder: 'delete my account',
-    type: 'password',
   },
   {
     name: 'password',
     label: 'Confirm your password:',
     placeholder: 'Enter your password',
+    type: 'password',
   },
 ]
 
