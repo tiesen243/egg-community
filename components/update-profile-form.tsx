@@ -27,7 +27,7 @@ const schema = z.object({
 })
 export const UpdateProfileForm: React.FC<Props> = ({ user }) => {
   const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
-  const handleSubmit = form.handleSubmit(async (formData: z.infer<typeof schema>) => {
+  const handleSubmit = form.handleSubmit(async (formData) => {
     const { data, error } = await api.user.update.patch({
       name: formData.name,
       bio: formData.bio,

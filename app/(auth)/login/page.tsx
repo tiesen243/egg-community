@@ -19,7 +19,7 @@ const schema = z.object({
 const Page: NextPage = () => {
   const router = useRouter()
   const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
-  const handleSubmit = form.handleSubmit(async (formData: z.infer<typeof schema>) => {
+  const handleSubmit = form.handleSubmit(async (formData) => {
     const { error } = await api.user['sign-in'].post(formData)
     if (error) return form.setError('root', { message: error.value.message })
     router.push('/')
@@ -29,7 +29,7 @@ const Page: NextPage = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit} className="w-full max-w-screen-md space-y-4">
+      <form onSubmit={handleSubmit} className="w-full max-w-screen-md space-y-4 px-4">
         {fields.map((field) => (
           <TextField key={field.name} control={form.control} disabled={isSubmitting} {...field} />
         ))}

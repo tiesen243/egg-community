@@ -9,10 +9,10 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import * as dialog from '@/components/ui/dialog'
 import { FileField, Form, TextField } from '@/components/ui/form'
+import { Textarea } from '@/components/ui/textarea'
 import { api } from '@/lib/api'
-import { fileToBase64 } from '@/lib/utils'
 import { revalidate } from '@/lib/revalidate'
-import { Textarea } from '../ui/textarea'
+import { fileToBase64 } from '@/lib/utils'
 
 const schema = z.object({
   content: z.string().min(1).max(1000),
@@ -22,7 +22,7 @@ const schema = z.object({
 export const CreatePost: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false)
   const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
-  const handleSubmit = form.handleSubmit(async (formData: z.infer<typeof schema>) => {
+  const handleSubmit = form.handleSubmit(async (formData) => {
     await api.post.create.post({
       content: formData.content,
       image: await fileToBase64(formData.image),

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import * as dialog from '@/components/ui/dialog'
 import { Form, TextField } from '@/components/ui/form'
 import { api } from '@/lib/api'
-import { deleteAccountSchema, type DeleteAccountSchema } from '@/lib/validators/user'
+import { z } from 'zod'
 
 const fields = [
   {
@@ -25,15 +25,19 @@ const fields = [
   },
 ]
 
+const schema = z.object({
+  confirm: z.string().refine((value) => value === 'delete my account', {
+    message: 'Please type "delete my account" to confirm',
+  }),
+  password: z.string().min(8, { message: 'Password must be at least 8 characters' }),
+})
+
 export const DeleteAccount: React.FC = () => {
   const router = useRouter()
-  const form = useForm<DeleteAccountSchema>({ resolver: zodResolver(deleteAccountSchema) })
+  const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
   const handleSubmit = form.handleSubmit(async (formData) => {
     const { data, error } = await api.user['delete-account'].delete(formData)
-    if (error) {
-      toast.error(error.value.message)
-      return
-    }
+    if (error) return toast.error(error.value.message)
     toast.success(data.message)
     router.push('/login')
     router.refresh()

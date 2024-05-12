@@ -37,7 +37,7 @@ const schema = z.object({
 })
 export const UpdatePostContent: React.FC<Props> = ({ post, setOpen }) => {
   const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
-  const handleSubmit = form.handleSubmit(async (formData: z.infer<typeof schema>) => {
+  const handleSubmit = form.handleSubmit(async (formData) => {
     const { error } = await api.post.update({ id: post.id }).patch({
       content: formData.content,
       image: await fileToBase64(formData.image),
