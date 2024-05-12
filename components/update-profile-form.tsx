@@ -1,12 +1,12 @@
 'use client'
 
-import Image from 'next/image'
-import { useState, useTransition } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { FileField, Form, TextField } from '@/components/ui/form'
 import { Textarea } from '@/components/ui/textarea'
 import { api } from '@/lib/api'
 import { revalidate } from '@/lib/revalidate'
@@ -19,64 +19,39 @@ interface Props {
     image: string | null
   }
 }
+
+const schema = z.object({
+  name: z.string(),
+  bio: z.string().optional(),
+  avatar: z.optional(z.instanceof(File)),
+})
 export const UpdateProfileForm: React.FC<Props> = ({ user }) => {
-  const [preview, setPreview] = useState<string | null>(null)
-  const [isPending, startTransition] = useTransition()
-  const handleSubmit = (formData: FormData) =>
-    startTransition(async () => {
-      const { data, error } = await api.user.update.patch({
-        name: String(formData.get('name')),
-        bio: String(formData.get('bio')),
-        avatar: await fileToBase64(formData.get('avatar') as File),
-      })
-      if (error) {
-        toast.error(error.value.message)
-        return
-      }
-      toast.success(data.message)
-      revalidate('users')
+  const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
+  const handleSubmit = form.handleSubmit(async (formData: z.infer<typeof schema>) => {
+    const { data, error } = await api.user.update.patch({
+      name: formData.name,
+      bio: formData.bio,
+      avatar: await fileToBase64(formData.avatar),
     })
+    if (error) return toast.error(error.value.message)
+    toast.success(data.message)
+    revalidate('user')
+  })
+  const isPending = form.formState.isSubmitting
 
   return (
-    <form action={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="name">Name</Label>
-        <Input name="name" defaultValue={user.name} disabled={isPending} />
-      </div>
+    <Form {...form}>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <TextField control={form.control} name="name" label="Name" defaultValue={user.name} />
+        <TextField control={form.control} name="bio" label="Bio" asChild>
+          <Textarea defaultValue={user.bio ?? ''} />
+        </TextField>
+        <FileField control={form.control} name="avatar" label="Avatar" />
 
-      <div className="space-y-2">
-        <Label htmlFor="bio">Bio</Label>
-        <Textarea disabled={isPending} defaultValue={user.bio ?? ''} />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="avatar">Avatar</Label>
-        <Input
-          type="file"
-          name="avatar"
-          accept="image/*"
-          onChange={async (e) => {
-            const file = e.target.files?.[0]
-            if (!file) return
-            const base64 = await fileToBase64(file)
-            setPreview(base64)
-          }}
-        />
-      </div>
-
-      {preview && (
-        <Image
-          src={preview}
-          alt="Preview"
-          width={200}
-          height={200}
-          className="mx-auto aspect-square rounded-full object-cover"
-        />
-      )}
-
-      <Button className="w-full" isLoading={isPending}>
-        Update
-      </Button>
-    </form>
+        <Button className="w-full" isLoading={isPending}>
+          Update
+        </Button>
+      </form>
+    </Form>
   )
 }

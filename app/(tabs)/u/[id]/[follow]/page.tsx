@@ -1,9 +1,9 @@
-import { Card, CardHeader, CardTitle } from '@/components/ui/card'
-import { Typography } from '@/components/ui/typography'
-import { api } from '@/lib/api'
 import type { NextPage } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
+
+import { Card, CardHeader, CardTitle } from '@/components/ui/card'
+import { api } from '@/lib/api'
 
 interface Props {
   params: { id: string; follow: 'following' | 'followers' }
@@ -15,9 +15,9 @@ const Page: NextPage<Props> = async ({ params: { id, follow } }) => {
 
   return (
     <section className="flex flex-col gap-4">
-      <Typography variant="h2">
+      <h3 className="text-3xl font-bold">
         {data.name}&apos;s {follow === 'following' ? 'following' : 'followers'}
-      </Typography>
+      </h3>
       {data.users?.map((user) => (
         <Link key={user.id} href={`/u/${user.id}`} passHref>
           <Card className="transition-colors ease-linear hover:bg-secondary">

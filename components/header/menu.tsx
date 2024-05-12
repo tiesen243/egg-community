@@ -10,17 +10,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Typography } from '@/components/ui/typography'
 import { LogOutBtn } from './log-out-btn'
 import { ThemeBtn } from './theme-btn'
 
 export const Menu: React.FC<{ id?: string; name?: string }> = async ({ id, name }) => {
-  if (!id || !name)
-    return (
-      <Typography variant="link" href="/login">
-        Login
-      </Typography>
-    )
+  // prettier-ignore
+  if (!id || !name) return <Link href="/login" className='hover:underline underline-offset-4'>Login</Link>
 
   return (
     <DropdownMenu>

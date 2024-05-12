@@ -1,7 +1,5 @@
 import { ChangePasswordForm } from '@/components/change-password-form'
 import { DeleteAccount } from '@/components/delete-account'
-import { Separator } from '@/components/ui/separator'
-import { Typography } from '@/components/ui/typography'
 import { UpdateProfileForm } from '@/components/update-profile-form'
 import { auth } from '@/server/auth'
 import type { NextPage } from 'next'
@@ -17,24 +15,22 @@ const Page: NextPage<Props> = async ({ params }) => {
 
   return (
     <>
-      <Typography variant="h2">Settings</Typography>
+      <h2 className="text-3xl font-bold">Settings</h2>
 
-      <Typography variant="h3">Profile</Typography>
+      <hr className="my-4" />
+
+      <h3 className="mb-2 text-2xl font-medium">Profile</h3>
       <UpdateProfileForm user={user} />
 
-      <Separator className="mt-4" />
+      <hr className="my-4" />
 
-      <Typography variant="h3">Change Password</Typography>
+      <h3 className="mb-2 text-2xl font-medium">Change Password</h3>
       <ChangePasswordForm />
 
-      <Separator className="mt-4" />
+      <hr className="my-4" />
 
-      <Typography variant="h3" color="destructive">
-        Delete Account
-      </Typography>
-      <Typography className="mb-2 [&:not(:first-child)]:mt-0">
-        Once you delete your account, there is no going back. Please be certain.
-      </Typography>
+      <h3 className="mb-2 text-2xl font-medium text-destructive">Delete Account</h3>
+      <p>Once you delete your account, there is no going back. Please be certain.</p>
       <DeleteAccount />
     </>
   )

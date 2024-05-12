@@ -2,7 +2,6 @@
 
 import { ChevronLeftIcon } from 'lucide-react'
 
-import { Typography } from '@/components/ui/typography'
 import { useRouter } from 'next/navigation'
 
 export const PostHeader: React.FC<{ authorName: string }> = ({ authorName }) => {
@@ -14,7 +13,7 @@ export const PostHeader: React.FC<{ authorName: string }> = ({ authorName }) => 
           onClick={() => router.back()}
           className="cursor-pointer hover:text-muted-foreground"
         />
-        <Typography variant="h3">{authorName}</Typography>
+        <h3 className="text-3xl font-bold">{authorName}</h3>
         <div />
       </div>
     </header>

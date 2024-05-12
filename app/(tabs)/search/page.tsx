@@ -1,7 +1,6 @@
 import { PostCard } from '@/components/post-card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Typography } from '@/components/ui/typography'
 import { UserCard } from '@/components/user-card'
 import { api } from '@/lib/api'
 import { auth } from '@/server/auth'
@@ -37,9 +36,7 @@ const Page: NextPage<Props> = async ({ searchParams: { keyword } }) => {
 
       {users && users.length > 0 && (
         <>
-          <Typography variant="h2" className="mt-4">
-            Users
-          </Typography>
+          <h2 className="mt-4 text-3xl font-bold">Users</h2>
           {users.map((user) => (
             <UserCard key={user.id} user={user} />
           ))}
@@ -48,9 +45,7 @@ const Page: NextPage<Props> = async ({ searchParams: { keyword } }) => {
 
       {posts && posts.length > 0 && (
         <>
-          <Typography variant="h2" className="my-4">
-            Posts
-          </Typography>
+          <h2 className="mt-4 text-3xl font-bold">Posts</h2>
           {posts.map((post) => (
             <PostCard key={post.id} post={post} />
           ))}

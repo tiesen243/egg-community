@@ -6,8 +6,6 @@ import Link from 'next/link'
 import { CreateComment } from '@/components/create-comment'
 import { LikeBtn } from '@/components/like-btn'
 import { PostHeader } from '@/components/post-header'
-import { Separator } from '@/components/ui/separator'
-import { Typography } from '@/components/ui/typography'
 import { api } from '@/lib/api'
 import { auth } from '@/server/auth'
 import { CommentMenu } from '@/components/comment-menu'
@@ -45,7 +43,7 @@ const Page: NextPage<Props> = async ({ params: { id } }) => {
   })
 
   if (!data || error)
-    return <Typography color="destructive">Error: {error.value.message}</Typography>
+    return <p className="text-center text-xs text-destructive">Error: {error.value.message}</p>
 
   return (
     <>
@@ -67,14 +65,20 @@ const Page: NextPage<Props> = async ({ params: { id } }) => {
           />
 
           <div>
-            <Typography variant="h3">{data.author.name}</Typography>
+            <h3 className="text-xl font-bold">{data.author.name}</h3>
             <p className="text-muted-foreground">
               Upload at: {new Date(data.createdAt).toDateString()}
             </p>
           </div>
         </Link>
 
-        <Typography className={!data.image ? 'mb-4' : ''}>{data.content}</Typography>
+        <hr className="my-4" />
+
+        <article className={!data.image ? 'mb-4' : ''}>
+          {data.content.split('\n').map((c, i) => (
+            <p key={i}>{c}</p>
+          ))}
+        </article>
 
         {data.image && (
           <Image
@@ -95,7 +99,7 @@ const Page: NextPage<Props> = async ({ params: { id } }) => {
           </div>
         </section>
 
-        <Separator className="my-4" />
+        <hr className="my-4" />
 
         <ul className="mb-20 space-y-4">
           {data.commentsList?.map((c) => (

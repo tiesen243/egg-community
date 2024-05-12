@@ -48,7 +48,11 @@ export const PostCard: React.FC<Props> = ({ post }) => (
     </Link>
 
     <Link href={`/p/${post.id}`}>
-      <CardHeader className="line-clamp-2 pb-0 pl-16 pt-14">{post.content}</CardHeader>
+      <CardHeader className="line-clamp-2 pb-0 pl-16 pt-14">
+        {post.content.split('\n').map((c, i) => (
+          <p key={i}>{c}</p>
+        ))}
+      </CardHeader>
 
       {post.image && (
         <CardContent className="pl-16 pt-2">

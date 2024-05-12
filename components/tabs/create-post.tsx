@@ -1,36 +1,37 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PencilIcon } from 'lucide-react'
-import { useState, useTransition } from 'react'
-import { toast } from 'sonner'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import * as dialog from '@/components/ui/dialog'
-import { Textarea } from '@/components/ui/textarea'
-import { fileToBase64 } from '@/lib/utils'
+import { FileField, Form, TextField } from '@/components/ui/form'
 import { api } from '@/lib/api'
+import { fileToBase64 } from '@/lib/utils'
 import { revalidate } from '@/lib/revalidate'
-import { Label } from '../ui/label'
-import { Input } from '../ui/input'
+import { Textarea } from '../ui/textarea'
+
+const schema = z.object({
+  content: z.string().min(1).max(1000),
+  image: z.optional(z.instanceof(File)),
+})
 
 export const CreatePost: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false)
-  const [isPending, startTransition] = useTransition()
-
-  const action = (formData: FormData) =>
-    startTransition(async () => {
-      const inp = {
-        content: String(formData.get('content')),
-        image: await fileToBase64(formData.get('image') as File),
-      }
-      const { error } = await api.post.create.post(inp)
-      if (error) {
-        toast.error(error.value.message)
-        return
-      }
-      revalidate('posts')
-      setOpen(false)
+  const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
+  const handleSubmit = form.handleSubmit(async (formData: z.infer<typeof schema>) => {
+    await api.post.create.post({
+      content: formData.content,
+      image: await fileToBase64(formData.image),
     })
+    form.reset()
+    setOpen(false)
+    revalidate('posts')
+  })
+  const isPending = form.formState.isSubmitting
 
   return (
     <dialog.Dialog open={open} onOpenChange={setOpen}>
@@ -48,21 +49,18 @@ export const CreatePost: React.FC = () => {
           </dialog.DialogDescription>
         </dialog.DialogHeader>
 
-        <form action={action} className="my-4 space-y-4">
-          <div>
-            <Label htmlFor="content">Content</Label>
-            <Textarea name="content" placeholder="What's on your mind?" />
-          </div>
+        <Form {...form}>
+          <form onSubmit={handleSubmit} className="my-4 space-y-4">
+            <TextField control={form.control} name="content" label="Content" asChild>
+              <Textarea />
+            </TextField>
+            <FileField control={form.control} name="image" label="Image" />
 
-          <div className="space-y-2">
-            <Label htmlFor="image">Image</Label>
-            <Input type="file" name="image" accept="image/*" />
-          </div>
-
-          <Button className="w-full" isLoading={isPending}>
-            Post
-          </Button>
-        </form>
+            <Button className="w-full" isLoading={isPending}>
+              Post
+            </Button>
+          </form>
+        </Form>
       </dialog.DialogContent>
     </dialog.Dialog>
   )

@@ -43,7 +43,7 @@ export const DeleteAccount: React.FC = () => {
   return (
     <dialog.Dialog>
       <dialog.DialogTrigger asChild>
-        <Button variant="destructive" className="w-full">
+        <Button variant="destructive" className="mt-2 w-full">
           Delete Account
         </Button>
       </dialog.DialogTrigger>
