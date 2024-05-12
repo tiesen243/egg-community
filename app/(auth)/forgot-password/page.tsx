@@ -2,15 +2,15 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { NextPage } from 'next'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import Link from 'next/link'
 
 import { Button } from '@/components/ui/button'
 import { Form, TextField } from '@/components/ui/form'
 import { api } from '@/lib/api'
-import { type ResetPasswordSchema, resetPasswordSchema } from '@/lib/validators/user'
+import { resetPasswordSchema, type ResetPasswordSchema } from '@/lib/validators/user'
 
 const fields = [{ name: 'email', type: 'email', label: 'Email', placeholder: 'abc@gmail.com' }]
 
@@ -47,7 +47,7 @@ const Page: NextPage = () => {
         </div>
 
         <Button className="w-full" isLoading={isPending}>
-          Login
+          Reset
         </Button>
       </form>
     </Form>
