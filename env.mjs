@@ -5,12 +5,18 @@ export const env = createEnv({
   // Server environment variables
   server: {
     NODE_ENV: z.enum(['development', 'test', 'production']),
+
+    // MongoDB connection string
     DATABASE_URL: z.string(),
+
+    // Cloudinary
     CLD_NAME: z.string(),
     CLD_API_KEY: z.string(),
     CLD_API_SECRET: z.string(),
-    EMAIL: z.string().email(),
-    SEND_EMAIL: z.string(),
+
+    // Email service (optional)
+    EMAIL: z.string().email().optional(),
+    SEND_EMAIL: z.string().optional(),
   },
 
   // Client environment variables

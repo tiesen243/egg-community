@@ -105,16 +105,17 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
       const newUser = await db.user.create({ data: { name, email, password } })
       if (!newUser) return error(500, { message: 'Failed to create user' })
 
-      fetch(env.SEND_EMAIL, {
-        method: 'POST',
-        body: JSON.stringify({
-          from: 'Egg Community',
-          to: email,
-          reply_to: env.EMAIL,
-          subject: 'Welcome to Egg Community',
-          message: `Hello ${newUser.name}, your account has been successfully created!<br>Thank you for joining us!`,
-        }),
-      })
+      if (env.SEND_EMAIL && env.EMAIL)
+        fetch(env.SEND_EMAIL, {
+          method: 'POST',
+          body: JSON.stringify({
+            from: 'Egg Community',
+            to: email,
+            reply_to: env.EMAIL,
+            subject: 'Welcome to Egg Community',
+            message: `Hello ${newUser.name}, your account has been successfully created!<br>Thank you for joining us!`,
+          }),
+        })
 
       return { message: 'User created successfully' }
     },
@@ -220,16 +221,17 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
       })
       if (!newUser) return error(500, { message: 'Failed to update password' })
 
-      fetch(env.SEND_EMAIL, {
-        method: 'POST',
-        body: JSON.stringify({
-          from: 'Egg Community',
-          to: user.email,
-          reply_to: env.EMAIL,
-          subject: 'Password Changed',
-          message: `Hello ${user.name}, your password has been successfully changed!<br>If you didn't do this, please contact us immediately.`,
-        }),
-      })
+      if (env.SEND_EMAIL && env.EMAIL)
+        fetch(env.SEND_EMAIL, {
+          method: 'POST',
+          body: JSON.stringify({
+            from: 'Egg Community',
+            to: user.email,
+            reply_to: env.EMAIL,
+            subject: 'Password Changed',
+            message: `Hello ${user.name}, your password has been successfully changed!<br>If you didn't do this, please contact us immediately.`,
+          }),
+        })
 
       return { message: 'Password changed successfully' }
     },
@@ -250,16 +252,17 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
       })
       if (!newUser) return error(500, { message: 'Failed to reset password' })
 
-      fetch(env.SEND_EMAIL, {
-        method: 'POST',
-        body: JSON.stringify({
-          from: 'Egg Community',
-          to: user.email,
-          reply_to: env.EMAIL,
-          subject: 'Password Reset',
-          message: `Hello ${user.name}, your password has been successfully reset!<br>Your new password is: <b>${newPassword}</b>`,
-        }),
-      })
+      if (env.SEND_EMAIL && env.EMAIL)
+        fetch(env.SEND_EMAIL, {
+          method: 'POST',
+          body: JSON.stringify({
+            from: 'Egg Community',
+            to: user.email,
+            reply_to: env.EMAIL,
+            subject: 'Password Reset',
+            message: `Hello ${user.name}, your password has been successfully reset!<br>Your new password is: <b>${newPassword}</b>`,
+          }),
+        })
 
       return { message: 'Password reset successfully' }
     },
@@ -279,16 +282,17 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
       if (!deletedUser) return error(500, { message: 'Failed to delete user' })
       if (user.image) await deleteFile(user.image)
 
-      fetch(env.SEND_EMAIL, {
-        method: 'POST',
-        body: JSON.stringify({
-          from: 'Egg Community',
-          to: user.email,
-          reply_to: env.EMAIL,
-          subject: 'Account Deleted',
-          message: `Hello ${user.name}, your account has been successfully deleted!<br>We're sorry to see you go!`,
-        }),
-      })
+      if (env.SEND_EMAIL && env.EMAIL)
+        fetch(env.SEND_EMAIL, {
+          method: 'POST',
+          body: JSON.stringify({
+            from: 'Egg Community',
+            to: user.email,
+            reply_to: env.EMAIL,
+            subject: 'Account Deleted',
+            message: `Hello ${user.name}, your account has been successfully deleted!<br>We're sorry to see you go!`,
+          }),
+        })
 
       return { message: 'User deleted successfully' }
     },
