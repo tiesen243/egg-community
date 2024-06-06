@@ -15,6 +15,7 @@ export const env = createEnv({
     CLD_API_SECRET: z.string(),
 
     // Email service (optional)
+    API_KEY: z.string().optional(),
     EMAIL: z.string().email().optional(),
     SEND_EMAIL: z.string().optional(),
   },
@@ -28,6 +29,7 @@ export const env = createEnv({
     CLD_NAME: process.env.CLD_NAME,
     CLD_API_KEY: process.env.CLD_API_KEY,
     CLD_API_SECRET: process.env.CLD_API_SECRET,
+    API_KEY: process.env.API_KEY,
     EMAIL: process.env.EMAIL,
     SEND_EMAIL: process.env.SEND_EMAIL,
   },

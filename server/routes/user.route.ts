@@ -114,6 +114,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
             reply_to: env.EMAIL,
             subject: 'Welcome to Egg Community',
             message: `Hello ${newUser.name}, your account has been successfully created!<br>Thank you for joining us!`,
+            api_key: env.API_KEY,
           }),
         })
 
@@ -230,6 +231,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
             reply_to: env.EMAIL,
             subject: 'Password Changed',
             message: `Hello ${user.name}, your password has been successfully changed!<br>If you didn't do this, please contact us immediately.`,
+            api_key: env.API_KEY,
           }),
         })
 
@@ -261,6 +263,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
             reply_to: env.EMAIL,
             subject: 'Password Reset',
             message: `Hello ${user.name}, your password has been successfully reset!<br>Your new password is: <b>${newPassword}</b>`,
+            api_key: env.API_KEY,
           }),
         })
 
@@ -291,6 +294,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
             reply_to: env.EMAIL,
             subject: 'Account Deleted',
             message: `Hello ${user.name}, your account has been successfully deleted!<br>We're sorry to see you go!`,
+            api_key: env.API_KEY,
           }),
         })
 
