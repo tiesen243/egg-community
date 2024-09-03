@@ -1,29 +1,65 @@
-# Create T3 App
+# Egg Community
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+This is a social network for the Egg Community. It is built with the [T3 Stack](https://create.t3.gg/), which is a full-stack framework for building modern web applications.
 
-## What's next? How do I make an app with this?
+## Tech Stack
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+- [Next.js](https://nextjs.org/)
+- [ElysiaJS](https://elysiajs.com/)
+- [Prisma](https://www.prisma.io/)
+- [Lucia](https://lucia-auth.com/)
+- [Cloudinary](https://cloudinary.com/)
+- [Resend](https://resend.com/)
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## Features
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+- User authentication
+- User profiles
+- Posts
+- Comments
+- Likes
+- Follows
 
-## Learn More
+## Getting Started
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+To get started, clone this repository and run the following commands:
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+```bash
+# using npm
+npm install
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+# using yarn
+yarn install
 
-## How do I deploy this?
+# using pnpm
+pnpm install
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+# using bun
+bun install
+```
+
+Then, add a `.env` file to the root of the project with the following environment variables:
+
+```bash
+cp .env.example .env
+```
+
+Finally, run the following command to start the development server:
+
+```bash
+# using npm
+npm run dev
+
+# using yarn
+yarn dev
+
+# using pnpm
+pnpm dev
+
+# using bun
+bun dev
+```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.
