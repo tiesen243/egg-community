@@ -25,11 +25,12 @@ const Page: NextPage<Props> = async ({ params: { id } }) => {
   })
 
   if (!data || error)
-    return <p className="text-center text-xs text-destructive">Error: {error.value.message}</p>
+    return <p className="text-center text-xs text-destructive">Error: {error.value}</p>
 
   return (
     <>
       <PostHeader authorName={data.author.name} />
+
       <main className="container max-w-screen-md">
         {user?.id === data.author.id && (
           <div className="absolute right-0 top-0">

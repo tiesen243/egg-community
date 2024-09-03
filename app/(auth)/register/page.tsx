@@ -42,7 +42,7 @@ const Page: NextPage = () => {
   const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
   const handleSubmit = form.handleSubmit(async (formData) => {
     const { error } = await api.user['sign-up'].post(formData)
-    if (error) return toast.error(error.value.message)
+    if (error) return toast.error(error.value)
     toast.success('Account created successfully')
     router.push('/')
     router.refresh()

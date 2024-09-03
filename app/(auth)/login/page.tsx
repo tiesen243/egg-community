@@ -23,12 +23,12 @@ const Page: NextPage = () => {
   const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
   const handleSubmit = form.handleSubmit(async (formData) => {
     const { error } = await api.user['sign-in'].post(formData)
-    if (error) return toast.error(error.value.message)
+    if (error) return toast.error(error.value)
     toast.success('Logged in successfully')
     router.push('/')
     router.refresh()
   })
-  const { isSubmitting, errors } = form.formState
+  const { isSubmitting } = form.formState
 
   return (
     <f.Form {...form}>
@@ -38,6 +38,7 @@ const Page: NextPage = () => {
             key={fs.name}
             control={form.control}
             name={fs.name}
+            disabled={isSubmitting}
             render={({ field }) => (
               <f.FormItem>
                 <f.FormLabel>{fs.label}</f.FormLabel>
@@ -49,8 +50,6 @@ const Page: NextPage = () => {
             )}
           />
         ))}
-
-        <p className="text-xs text-destructive">{errors.root?.message}</p>
 
         <div className="flex flex-col items-end">
           <span className="underline-offset-4 hover:*:underline">

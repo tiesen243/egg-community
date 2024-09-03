@@ -34,7 +34,7 @@ export const UpdateProfileForm: React.FC<Props> = ({ user }) => {
       bio: formData.bio,
       avatar: await fileToBase64(formData.avatar),
     })
-    if (error) return toast.error(error.value.message)
+    if (error) return toast.error(error.value)
     toast.success(data.message)
     await revalidate('user')
   })

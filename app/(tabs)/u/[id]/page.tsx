@@ -17,7 +17,7 @@ const Page: NextPage<Props> = async ({ params }) => {
   const { data, error } = await api.user
     .info({ id: params.id })
     .get({ query: { id: user?.id ?? '' }, fetch: { next: { tags: ['users'] } } })
-  if (!data || error) return <div>Error: {error.value.message ?? 'Unknown error'}</div>
+  if (!data || error) return <div>Error: {error.value ?? 'Unknown error'}</div>
 
   return (
     <>

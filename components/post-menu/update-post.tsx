@@ -42,7 +42,7 @@ export const UpdatePostContent: React.FC<Props> = ({ post, setOpen }) => {
       content: formData.content,
       image: await fileToBase64(formData.image),
     })
-    if (error) return toast.error(error.value.message)
+    if (error) return toast.error(error.value)
     await revalidate('posts')
     setOpen(false)
   })

@@ -11,7 +11,7 @@ const Page: NextPage = async () => {
     fetch: { next: { tags: ['posts'] } },
   })
 
-  if (!data || error) return <div>Error: {error.value.message ?? 'No data'}</div>
+  if (!data || error) return <div>Error: {error.value ?? 'No data'}</div>
 
   return data.map((post) => <PostCard key={post.id} post={post} />)
 }

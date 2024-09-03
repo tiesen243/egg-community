@@ -13,7 +13,7 @@ const Page: NextPage = async () => {
     query: { id: user.id },
     fetch: { next: { tags: ['posts'] } },
   })
-  if (error) return <div>{error.value.message}</div>
+  if (error) return <div>{error.value}</div>
 
   return data.map((post) => <PostCard key={post.id} post={post} />)
 }

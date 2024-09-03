@@ -11,7 +11,7 @@ interface Props {
 
 const Page: NextPage<Props> = async ({ params: { id, follow } }) => {
   const { data, error } = await api.user({ id })[follow].get()
-  if (error) return <div>{error.value.message}</div>
+  if (error) return <div>{error.value}</div>
 
   return (
     <section className="flex flex-col gap-4">

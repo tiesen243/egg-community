@@ -15,7 +15,7 @@ interface Props {
 export const LikeBtn: React.FC<Props> = (props) => {
   const handleClick = async () => {
     const { error } = await api.post.like({ id: props.id }).post()
-    if (error) return toast.error(error.value.message)
+    if (error) return toast.error(error.value)
     revalidate('posts')
   }
 
