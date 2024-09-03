@@ -8,7 +8,8 @@ import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import * as dialog from '@/components/ui/dialog'
-import { FileField, Form, TextField } from '@/components/ui/form'
+import * as form_1 from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { api } from '@/lib/api'
 import { revalidate } from '@/lib/revalidate'
@@ -29,7 +30,7 @@ export const CreatePost: React.FC = () => {
     })
     form.reset()
     setOpen(false)
-    revalidate('posts')
+    await revalidate('posts')
   })
   const isPending = form.formState.isSubmitting
 
@@ -49,18 +50,46 @@ export const CreatePost: React.FC = () => {
           </dialog.DialogDescription>
         </dialog.DialogHeader>
 
-        <Form {...form}>
+        <form_1.Form {...form}>
           <form onSubmit={handleSubmit} className="my-4 space-y-4">
-            <TextField control={form.control} name="content" label="Content" asChild>
-              <Textarea />
-            </TextField>
-            <FileField control={form.control} name="image" label="Image" />
+            <form_1.FormField
+              control={form.control}
+              name="content"
+              render={({ field }) => (
+                <form_1.FormItem>
+                  <form_1.FormControl>
+                    <Textarea {...field} />
+                  </form_1.FormControl>
+                  <form_1.FormMessage />
+                </form_1.FormItem>
+              )}
+            />
+
+            <form_1.FormField
+              control={form.control}
+              name="image"
+              render={({ field: { value: _v, ...field } }) => (
+                <form_1.FormItem>
+                  <form_1.FormControl>
+                    <Input
+                      {...field}
+                      type="file"
+                      onChange={(event) => {
+                        if (!event.target.files) return
+                        field.onChange(event.target.files[0])
+                      }}
+                    />
+                  </form_1.FormControl>
+                  <form_1.FormMessage />
+                </form_1.FormItem>
+              )}
+            />
 
             <Button className="w-full" isLoading={isPending}>
               Post
             </Button>
           </form>
-        </Form>
+        </form_1.Form>
       </dialog.DialogContent>
     </dialog.Dialog>
   )

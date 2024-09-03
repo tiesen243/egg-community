@@ -6,11 +6,12 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
-import { FileField, Form, TextField } from '@/components/ui/form'
+import * as f from '@/components/ui/form'
 import { Textarea } from '@/components/ui/textarea'
 import { api } from '@/lib/api'
 import { revalidate } from '@/lib/revalidate'
 import { fileToBase64 } from '@/lib/utils'
+import { Input } from './ui/input'
 
 interface Props {
   user: {
@@ -35,23 +36,68 @@ export const UpdateProfileForm: React.FC<Props> = ({ user }) => {
     })
     if (error) return toast.error(error.value.message)
     toast.success(data.message)
-    revalidate('user')
+    await revalidate('user')
   })
   const isPending = form.formState.isSubmitting
 
   return (
-    <Form {...form}>
+    <f.Form {...form}>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <TextField control={form.control} name="name" label="Name" defaultValue={user.name} />
-        <TextField control={form.control} name="bio" label="Bio" asChild>
-          <Textarea defaultValue={user.bio ?? ''} />
-        </TextField>
-        <FileField control={form.control} name="avatar" label="Avatar" />
+        <f.FormField
+          control={form.control}
+          name="name"
+          defaultValue={user.name}
+          render={({ field }) => (
+            <f.FormItem>
+              <f.FormLabel>Name</f.FormLabel>
+              <f.FormControl>
+                <Input {...field} />
+              </f.FormControl>
+              <f.FormMessage />
+            </f.FormItem>
+          )}
+        />
+
+        <f.FormField
+          control={form.control}
+          name="bio"
+          defaultValue={user.bio ?? ''}
+          render={({ field }) => (
+            <f.FormItem>
+              <f.FormLabel>Bio</f.FormLabel>
+              <f.FormControl>
+                <Textarea {...field} />
+              </f.FormControl>
+              <f.FormMessage />
+            </f.FormItem>
+          )}
+        />
+
+        <f.FormField
+          control={form.control}
+          name="avatar"
+          render={({ field: { value: _v, ...field } }) => (
+            <f.FormItem>
+              <f.FormLabel>Avatar</f.FormLabel>
+              <f.FormControl>
+                <Input
+                  {...field}
+                  type="file"
+                  onChange={(event) => {
+                    if (!event.target.files) return
+                    field.onChange(event.target.files[0])
+                  }}
+                />
+              </f.FormControl>
+              <f.FormMessage />
+            </f.FormItem>
+          )}
+        />
 
         <Button className="w-full" isLoading={isPending}>
           Update
         </Button>
       </form>
-    </Form>
+    </f.Form>
   )
 }

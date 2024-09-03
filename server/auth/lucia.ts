@@ -1,9 +1,16 @@
 import { PrismaAdapter } from '@lucia-auth/adapter-prisma'
-import { User } from '@prisma/client'
-import { Lucia, TimeSpan } from 'lucia'
+import type { User } from '@prisma/client'
+import { Lucia } from 'lucia'
 
-import { env } from '@/env.mjs'
-import { db } from '@/prisma'
+import { env } from '@/env'
+import { db } from '@/server/db'
+
+const adapter = new PrismaAdapter(db.session, db.user)
+
+export const lucia = new Lucia(adapter, {
+  sessionCookie: { expires: false, attributes: { secure: env.NODE_ENV === 'production' } },
+  getUserAttributes: (attr) => attr,
+})
 
 declare module 'lucia' {
   interface Register {
@@ -11,14 +18,3 @@ declare module 'lucia' {
     DatabaseUserAttributes: User
   }
 }
-
-const adapter = new PrismaAdapter(db.session, db.user)
-
-export const lucia = new Lucia(adapter, {
-  sessionExpiresIn: new TimeSpan(30, 'd'),
-  sessionCookie: {
-    expires: false,
-    attributes: { secure: env.NODE_ENV === 'production' },
-  },
-  getUserAttributes: (attr) => attr,
-})

@@ -3,35 +3,17 @@ import type { Metadata, NextPage, ResolvingMetadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { CommentMenu } from '@/components/comment-menu'
 import { CreateComment } from '@/components/create-comment'
 import { LikeBtn } from '@/components/like-btn'
 import { PostHeader } from '@/components/post-header'
-import { api } from '@/lib/api'
-import { auth } from '@/server/auth'
-import { CommentMenu } from '@/components/comment-menu'
 import { PostMenu } from '@/components/post-menu'
+import { api } from '@/lib/api'
+import { seo } from '@/lib/seo'
+import { auth } from '@/server/auth'
 
 interface Props {
   params: { id: string }
-}
-
-export const generateMetadata = async (
-  { params }: Props,
-  parent: ResolvingMetadata,
-): Promise<Metadata> => {
-  const { data, error } = await api.post['get-one']({ id: params.id }).get({ query: {} })
-  if (!data || error) return { title: 'Error' }
-  const previousImages = (await parent).openGraph?.images ?? []
-
-  return {
-    title: data?.content.length > 20 ? data?.content.slice(0, 20) + '...' : data?.content,
-    openGraph: {
-      images: [
-        `/og?title=${data.author.name}&desc=${data.content ?? ''}&image=${data.image ?? data.author.image ?? ''}`,
-        ...previousImages,
-      ],
-    },
-  }
 }
 
 const Page: NextPage<Props> = async ({ params: { id } }) => {
@@ -134,3 +116,22 @@ const Page: NextPage<Props> = async ({ params: { id } }) => {
 }
 
 export default Page
+
+export const generateMetadata = async (
+  { params }: Props,
+  parent: ResolvingMetadata,
+): Promise<Metadata> => {
+  const { data, error } = await api.post['get-one']({ id: params.id }).get({ query: {} })
+  if (!data || error) return { title: 'Error' }
+  const previousImages = (await parent).openGraph?.images ?? []
+
+  return seo({
+    title: data?.content.length > 20 ? data?.content.slice(0, 20) + '...' : data?.content,
+    url: `/p/${params.id}`,
+    description: data?.content,
+    images: [
+      `/api/og?title=${data.author.name}&desc=${data.content ?? ''}&image=${data.image ?? data.author.image ?? ''}`,
+      ...previousImages,
+    ],
+  })
+}

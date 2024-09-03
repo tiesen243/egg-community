@@ -1,10 +1,11 @@
-import { getBaseUrl } from '@/lib/site'
+import type { MetadataRoute } from 'next'
 
-const baseUrl = getBaseUrl()
-export default function robots() {
-  return {
-    rules: [{ userAgent: '*' }],
-    sitemap: `${baseUrl}/sitemap.xml`,
-    host: baseUrl,
-  }
-}
+import { getBaseUrl } from '@/lib/utils'
+
+const robots = (): MetadataRoute.Robots => ({
+  rules: [{ userAgent: '*' }],
+  sitemap: `${getBaseUrl()}/sitemap.xml`,
+  host: getBaseUrl(),
+})
+
+export default robots

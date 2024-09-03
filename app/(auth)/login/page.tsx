@@ -8,8 +8,10 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
-import { Form, TextField } from '@/components/ui/form'
+import * as f from '@/components/ui/form'
 import { api } from '@/lib/api'
+import { Input } from '@/components/ui/input'
+import { toast } from 'sonner'
 
 const schema = z.object({
   email: z.string().email('Email is invalid'),
@@ -21,17 +23,31 @@ const Page: NextPage = () => {
   const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
   const handleSubmit = form.handleSubmit(async (formData) => {
     const { error } = await api.user['sign-in'].post(formData)
-    if (error) return form.setError('root', { message: error.value.message })
+    if (error) return toast.error(error.value.message)
+    toast.success('Logged in successfully')
     router.push('/')
     router.refresh()
   })
   const { isSubmitting, errors } = form.formState
 
   return (
-    <Form {...form}>
+    <f.Form {...form}>
       <form onSubmit={handleSubmit} className="w-full max-w-screen-md space-y-4 px-4">
-        {fields.map((field) => (
-          <TextField key={field.name} control={form.control} disabled={isSubmitting} {...field} />
+        {fields.map((fs) => (
+          <f.FormField
+            key={fs.name}
+            control={form.control}
+            name={fs.name}
+            render={({ field }) => (
+              <f.FormItem>
+                <f.FormLabel>{fs.label}</f.FormLabel>
+                <f.FormControl>
+                  <Input {...field} {...fs} />
+                </f.FormControl>
+                <f.FormMessage />
+              </f.FormItem>
+            )}
+          />
         ))}
 
         <p className="text-xs text-destructive">{errors.root?.message}</p>
@@ -50,13 +66,18 @@ const Page: NextPage = () => {
           Login
         </Button>
       </form>
-    </Form>
+    </f.Form>
   )
 }
 
 const fields = [
-  { name: 'email', label: 'Email', placeholder: 'Enter your email', type: 'email' },
-  { name: 'password', label: 'Password', placeholder: 'Enter your password', type: 'password' },
+  { name: 'email' as const, label: 'Email', placeholder: 'Enter your email', type: 'email' },
+  {
+    name: 'password' as const,
+    label: 'Password',
+    placeholder: 'Enter your password',
+    type: 'password',
+  },
 ]
 
 export default Page

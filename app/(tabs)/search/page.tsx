@@ -1,12 +1,13 @@
+import { redirect } from 'next/navigation'
+import { SearchIcon } from 'lucide-react'
+import type { NextPage } from 'next'
+
 import { PostCard } from '@/components/post-card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { UserCard } from '@/components/user-card'
 import { api } from '@/lib/api'
 import { auth } from '@/server/auth'
-import { SearchIcon } from 'lucide-react'
-import type { NextPage } from 'next'
-import { redirect } from 'next/navigation'
 
 interface Props {
   searchParams: {

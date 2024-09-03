@@ -43,7 +43,7 @@ export const UpdatePostContent: React.FC<Props> = ({ post, setOpen }) => {
       image: await fileToBase64(formData.image),
     })
     if (error) return toast.error(error.value.message)
-    revalidate('posts')
+    await revalidate('posts')
     setOpen(false)
   })
   const isPending = form.formState.isSubmitting

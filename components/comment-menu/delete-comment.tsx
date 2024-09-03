@@ -7,7 +7,7 @@ import { revalidate } from '@/lib/revalidate'
 export const DeleteComment: React.FC<{ id: string }> = ({ id }) => {
   const handleDelete = async () => {
     await api.comment({ id }).delete()
-    revalidate('posts')
+    await revalidate('posts')
   }
   return (
     <DropdownMenuItem onClick={handleDelete}>

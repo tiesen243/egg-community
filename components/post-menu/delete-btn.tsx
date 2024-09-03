@@ -9,7 +9,7 @@ export const DeleteBtn: React.FC<{ id: string }> = ({ id }) => {
   const handleClick = async () => {
     const { error } = await api.post['delete-post']({ id }).delete()
     if (error) toast.error(error.value.message)
-    revalidate('posts')
+    await revalidate('posts')
   }
 
   return (

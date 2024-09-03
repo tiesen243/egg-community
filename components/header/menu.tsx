@@ -1,5 +1,5 @@
-import Link from 'next/link'
 import { MenuIcon, SettingsIcon } from 'lucide-react'
+import Link from 'next/link'
 
 import {
   DropdownMenu,
@@ -10,12 +10,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { auth } from '@/server/auth'
 import { LogOutBtn } from './log-out-btn'
 import { ThemeBtn } from './theme-btn'
 
-export const Menu: React.FC<{ id?: string; name?: string }> = async ({ id, name }) => {
+export const Menu: React.FC = async () => {
+  const { user } = await auth()
+
   // prettier-ignore
-  if (!id || !name) return <Link href="/login" className='hover:underline underline-offset-4'>Login</Link>
+  if (!user) return <Link href="/login" className='hover:underline underline-offset-4'>Login</Link>
 
   return (
     <DropdownMenu>
@@ -24,11 +27,11 @@ export const Menu: React.FC<{ id?: string; name?: string }> = async ({ id, name 
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="mt-2" align="end">
-        <DropdownMenuLabel>{name}</DropdownMenuLabel>
+        <DropdownMenuLabel>{user.name}</DropdownMenuLabel>
         <DropdownMenuSeparator />
 
         <DropdownMenuGroup>
-          <Link href={`/u/${id}/settings`} passHref>
+          <Link href={`/u/${user.id}/settings`} passHref>
             <DropdownMenuItem>
               <SettingsIcon className="mr-2" /> Settings
             </DropdownMenuItem>

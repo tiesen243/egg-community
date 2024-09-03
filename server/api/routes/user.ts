@@ -1,16 +1,13 @@
-import Elysia from 'elysia'
 import { Scrypt } from 'lucia'
 import { cookies } from 'next/headers'
 
-import { env } from '@/env.mjs'
 import { deleteFile, saveFile } from '@/lib/cloudinary'
-import { db } from '@/prisma'
+import { createElysia } from '@/server/api/elysia'
+import { userModel } from '@/server/api/models/user'
 import { lucia } from '@/server/auth/lucia'
-import { userModel } from '@/server/models/user.model'
-import { context } from '@/server/plugins'
+import { sendEmail } from '@/server/email/action'
 
-export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
-  .use(context)
+export const userRoute = createElysia({ name: 'Route.User', prefix: '/user' })
   .use(userModel)
 
   // [GET] /api/user/get-all
@@ -22,7 +19,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
         select: { id: true, name: true, image: true },
         orderBy: { createdAt: 'desc' },
       })
-      if (!users) return error(404, { message: 'Users not found' })
+      if (!users) return error(404, 'Users not found')
 
       return users
     },
@@ -47,7 +44,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
           _count: { select: { posts: true, followers: true, following: true } },
         },
       })
-      if (!user) return error(404, { message: 'User not found' })
+      if (!user) return error(404, 'User not found')
 
       const isFollowing = query.id
         ? await db.user.findFirst({
@@ -77,7 +74,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
       where: { id },
       include: { following: { select: { id: true, name: true, image: true } } },
     })
-    if (!user) return error(404, { message: 'User not found' })
+    if (!user) return error(404, 'User not found')
 
     return { name: user.name, users: user.following }
   })
@@ -88,7 +85,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
       where: { id },
       include: { followers: { select: { id: true, name: true, image: true } } },
     })
-    if (!user) return error(404, { message: 'User not found' })
+    if (!user) return error(404, 'User not found')
 
     return { name: user.name, users: user.followers }
   })
@@ -99,24 +96,13 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
     async ({ db, body, error }) => {
       const { name, email } = body
       const user = await db.user.findUnique({ where: { email } })
-      if (user) return error(409, { message: 'User already exists' })
+      if (user) return error(409, 'User already exists')
 
       const password = await new Scrypt().hash(body.password)
       const newUser = await db.user.create({ data: { name, email, password } })
-      if (!newUser) return error(500, { message: 'Failed to create user' })
+      if (!newUser) return error(500, 'Failed to create user')
 
-      if (env.SEND_EMAIL && env.EMAIL)
-        fetch(env.SEND_EMAIL, {
-          method: 'POST',
-          body: JSON.stringify({
-            from: 'Egg Community',
-            to: email,
-            reply_to: env.EMAIL,
-            subject: 'Welcome to Egg Community',
-            message: `Hello ${newUser.name}, your account has been successfully created!<br>Thank you for joining us!`,
-            api_key: env.API_KEY,
-          }),
-        })
+      await sendEmail({ email, name, subject: 'Welcome to Egg Community', type: 'welcome' })
 
       return { message: 'User created successfully' }
     },
@@ -126,12 +112,12 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
   // [POST] /api/user/sign-in
   .post(
     '/sign-in',
-    async ({ body: { email, password }, error }) => {
+    async ({ body: { email, password }, db, error }) => {
       const user = await db.user.findUnique({ where: { email: email } })
-      if (!user) return error(404, { message: 'User not found' })
+      if (!user) return error(404, 'User not found')
 
       const isValid = await new Scrypt().verify(user.password, password)
-      if (!isValid) return error(401, { message: 'Password is incorrect' })
+      if (!isValid) return error(401, 'Password is incorrect')
 
       const session = await lucia.createSession(user.id, {})
       const sessionCookie = lucia.createSessionCookie(session.id)
@@ -152,9 +138,10 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
   .post(
     '/follow',
     async ({ db, user, body: { id }, error }) => {
-      if (!user) return error(401, { message: 'You are not authorized to follow' })
+      if (!user) return error(401, 'You are not authorized to follow')
+
       const userToFollow = await db.user.findUnique({ where: { id } })
-      if (!userToFollow) return error(404, { message: 'User not found' })
+      if (!userToFollow) return error(404, 'User not found')
 
       let addedFollow = false
       const followed = await db.user.findFirst({
@@ -186,7 +173,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
   .patch(
     '/update',
     async ({ db, user, body, error }) => {
-      if (!user) return error(401, { message: 'Unauthorized' })
+      if (!user) return error(401, 'Unauthorized')
 
       const newAvatar = await saveFile(body.avatar!, 'avatar').then((res) =>
         res?.error ? user.image : res?.url,
@@ -200,7 +187,7 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
           image: newAvatar,
         },
       })
-      if (!newUser) return error(500, { message: 'Failed to update user' })
+      if (!newUser) return error(500, 'Failed to update user')
 
       if (body.avatar && user?.image) await deleteFile(user.image)
       return { message: 'User updated successfully' }
@@ -212,28 +199,16 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
   .patch(
     '/change-password',
     async ({ db, user, body, error }) => {
-      if (!user) return error(401, { message: 'Unauthorized' })
+      if (!user) return error(401, 'Unauthorized')
+
       const isValid = await new Scrypt().verify(user.password, body.oldPassword)
-      if (!isValid) return error(401, { message: 'Password is incorrect' })
+      if (!isValid) return error(401, 'Password is incorrect')
 
       const newUser = await db.user.update({
         where: { id: user.id },
         data: { password: await new Scrypt().hash(body.newPassword) },
       })
-      if (!newUser) return error(500, { message: 'Failed to update password' })
-
-      if (env.SEND_EMAIL && env.EMAIL)
-        fetch(env.SEND_EMAIL, {
-          method: 'POST',
-          body: JSON.stringify({
-            from: 'Egg Community',
-            to: user.email,
-            reply_to: env.EMAIL,
-            subject: 'Password Changed',
-            message: `Hello ${user.name}, your password has been successfully changed!<br>If you didn't do this, please contact us immediately.`,
-            api_key: env.API_KEY,
-          }),
-        })
+      if (!newUser) return error(500, 'Failed to update password')
 
       return { message: 'Password changed successfully' }
     },
@@ -245,27 +220,21 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
     '/reset-password',
     async ({ db, body, error }) => {
       const user = await db.user.findUnique({ where: { email: body.email } })
-      if (!user) return error(404, { message: 'User not found' })
+      if (!user) return error(404, 'User not found')
 
       const newPassword = `Egg#${Math.floor(1000000 + Math.random() * 9000000)}`
       const newUser = await db.user.update({
         where: { id: user.id },
         data: { password: await new Scrypt().hash(newPassword) },
       })
-      if (!newUser) return error(500, { message: 'Failed to reset password' })
+      if (!newUser) return error(500, 'Failed to reset password')
 
-      if (env.SEND_EMAIL && env.EMAIL)
-        fetch(env.SEND_EMAIL, {
-          method: 'POST',
-          body: JSON.stringify({
-            from: 'Egg Community',
-            to: user.email,
-            reply_to: env.EMAIL,
-            subject: 'Password Reset',
-            message: `Hello ${user.name}, your password has been successfully reset!<br>Your new password is: <b>${newPassword}</b>`,
-            api_key: env.API_KEY,
-          }),
-        })
+      await sendEmail({
+        email: user.email,
+        subject: 'Password Reset',
+        type: 'reset-password',
+        data: { newPassword },
+      })
 
       return { message: 'Password reset successfully' }
     },
@@ -276,27 +245,21 @@ export const userRoute = new Elysia({ name: 'Route.User', prefix: '/user' })
   .delete(
     '/delete-account',
     async ({ db, user, body: { password }, error }) => {
-      if (!user) return error(401, { message: 'You are not authorized' })
+      if (!user) return error(401, 'You are not authorized')
 
       const isValid = await new Scrypt().verify(user.password, password)
-      if (!isValid) return error(401, { message: 'Password is incorrect' })
+      if (!isValid) return error(401, 'Password is incorrect')
 
       const deletedUser = await db.user.delete({ where: { id: user.id } })
-      if (!deletedUser) return error(500, { message: 'Failed to delete user' })
+      if (!deletedUser) return error(500, 'Failed to delete user')
       if (user.image) await deleteFile(user.image)
 
-      if (env.SEND_EMAIL && env.EMAIL)
-        fetch(env.SEND_EMAIL, {
-          method: 'POST',
-          body: JSON.stringify({
-            from: 'Egg Community',
-            to: user.email,
-            reply_to: env.EMAIL,
-            subject: 'Account Deleted',
-            message: `Hello ${user.name}, your account has been successfully deleted!<br>We're sorry to see you go!`,
-            api_key: env.API_KEY,
-          }),
-        })
+      await sendEmail({
+        email: user.email,
+        name: user.name,
+        subject: 'Account Deleted',
+        type: 'delete-account',
+      })
 
       return { message: 'User deleted successfully' }
     },

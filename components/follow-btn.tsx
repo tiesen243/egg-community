@@ -19,7 +19,7 @@ export const FollowBtn: React.FC<Props> = ({ id, isFollowing }) => {
   const handleFollow = () =>
     startTransition(async () => {
       const { data, error } = await api.user.follow.post({ id })
-      if (error) toast.error(error.value.message)
+      if (error) toast.error(error.value)
       else {
         toast.success(data.message)
         router.refresh()

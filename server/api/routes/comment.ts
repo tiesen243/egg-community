@@ -1,9 +1,7 @@
-import Elysia from 'elysia'
-import { context } from '../plugins'
-import { commentModel } from '../models/comment.model'
+import { createElysia } from '@/server/api/elysia'
+import { commentModel } from '@/server/api/models/comment'
 
-export const commentRoute = new Elysia({ prefix: '/comment' })
-  .use(context)
+export const commentRoute = createElysia({ prefix: '/comment' })
   .use(commentModel)
 
   // [POST] /api/comment/:id

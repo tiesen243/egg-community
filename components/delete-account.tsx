@@ -4,40 +4,20 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import * as dialog from '@/components/ui/dialog'
-import { Form, TextField } from '@/components/ui/form'
+import * as f from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import { api } from '@/lib/api'
-import { z } from 'zod'
-
-const fields = [
-  {
-    name: 'confirm',
-    label: 'To verify, type "delete my account" below: ',
-    placeholder: 'delete my account',
-  },
-  {
-    name: 'password',
-    label: 'Confirm your password:',
-    placeholder: 'Enter your password',
-    type: 'password',
-  },
-]
-
-const schema = z.object({
-  confirm: z.string().refine((value) => value === 'delete my account', {
-    message: 'Please type "delete my account" to confirm',
-  }),
-  password: z.string().min(8, { message: 'Password must be at least 8 characters' }),
-})
 
 export const DeleteAccount: React.FC = () => {
   const router = useRouter()
   const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
   const handleSubmit = form.handleSubmit(async (formData) => {
     const { data, error } = await api.user['delete-account'].delete(formData)
-    if (error) return toast.error(error.value.message)
+    if (error) return toast.error(error.value)
     toast.success(data.message)
     router.push('/login')
     router.refresh()
@@ -60,10 +40,23 @@ export const DeleteAccount: React.FC = () => {
           </dialog.DialogDescription>
         </dialog.DialogHeader>
 
-        <Form {...form}>
+        <f.Form {...form}>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {fields.map((field) => (
-              <TextField key={field.name} control={form.control} {...field} />
+            {fields.map((fs) => (
+              <f.FormField
+                key={fs.name}
+                control={form.control}
+                name={fs.name}
+                render={({ field }) => (
+                  <f.FormItem>
+                    <f.FormLabel>{fs.label}</f.FormLabel>
+                    <f.FormControl>
+                      <Input {...field} {...fs} />
+                    </f.FormControl>
+                    <f.FormMessage />
+                  </f.FormItem>
+                )}
+              />
             ))}
 
             <dialog.DialogFooter className="gird w-full grid-cols-2">
@@ -76,8 +69,29 @@ export const DeleteAccount: React.FC = () => {
               </Button>
             </dialog.DialogFooter>
           </form>
-        </Form>
+        </f.Form>
       </dialog.DialogContent>
     </dialog.Dialog>
   )
 }
+
+const fields = [
+  {
+    name: 'confirm' as const,
+    label: 'To verify, type "delete my account" below: ',
+    placeholder: 'delete my account',
+  },
+  {
+    name: 'password' as const,
+    label: 'Confirm your password:',
+    placeholder: 'Enter your password',
+    type: 'password',
+  },
+]
+
+const schema = z.object({
+  confirm: z.string().refine((value) => value === 'delete my account', {
+    message: 'Please type "delete my account" to confirm',
+  }),
+  password: z.string().min(8, { message: 'Password must be at least 8 characters' }),
+})

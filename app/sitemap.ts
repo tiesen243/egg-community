@@ -1,6 +1,7 @@
-import { getBaseUrl } from '@/lib/site'
-import { db } from '@/prisma'
 import type { MetadataRoute } from 'next'
+
+import { getBaseUrl } from '@/lib/utils'
+import { db } from '@/server/db'
 
 interface Route {
   url: string
@@ -38,7 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     fetchedRoutes = (await Promise.all([userRoute, postRoute])).flat()
   } catch (error) {
-    throw JSON.stringify(error, null, 2)
+    if (error instanceof Error) throw new Error(error.message)
   }
   return [...routesMap, ...fetchedRoutes]
 }

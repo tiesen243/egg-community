@@ -7,6 +7,23 @@ const get = t.Partial(
   }),
 )
 
+const getAll = t.Array(
+  t.Object({
+    id: t.String(),
+    content: t.String(),
+    image: t.String(),
+    createdAt: t.Date(),
+    author: t.Object({
+      id: t.String(),
+      name: t.String(),
+      image: t.String(),
+    }),
+    isLiked: t.Boolean(),
+    likes: t.Number(),
+    comments: t.Number(),
+  }),
+)
+
 const createPost = t.Object({
   content: t.String(),
   image: t.String(),
@@ -25,6 +42,7 @@ const deletePost = t.Object({
 
 export const postModel = new Elysia({ name: 'Model.Post' }).model({
   get,
+  getAll,
   createPost,
   updatePost,
   deletePost,

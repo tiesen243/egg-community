@@ -4,7 +4,8 @@ import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Form, TextField } from '@/components/ui/form'
+import * as f from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import { api } from '@/lib/api'
 import { revalidate } from '@/lib/revalidate'
 
@@ -21,7 +22,7 @@ export const EditComment: React.FC<Props> = (props) => {
   const handleSubmit = form.handleSubmit(async (formData) => {
     await api.comment({ id: props.id }).patch(formData)
     props.setOpen(false)
-    revalidate('posts')
+    await revalidate('posts')
   })
   const isPending = form.formState.isSubmitting
 
@@ -31,22 +32,28 @@ export const EditComment: React.FC<Props> = (props) => {
         <DialogTitle>Edit your comment</DialogTitle>
       </DialogHeader>
 
-      <Form {...form}>
+      <f.Form {...form}>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <TextField
+          <f.FormField
             control={form.control}
             name="content"
-            label="Content"
             defaultValue={props.content}
-            placeholder="What's on your mind?"
             disabled={isPending}
+            render={({ field }) => (
+              <f.FormItem>
+                <f.FormControl>
+                  <Input {...field} placeholder="Your comment" />
+                </f.FormControl>
+                <f.FormMessage />
+              </f.FormItem>
+            )}
           />
 
           <DialogFooter>
             <Button isLoading={isPending}>Save</Button>
           </DialogFooter>
         </form>
-      </Form>
+      </f.Form>
     </DialogContent>
   )
 }

@@ -1,61 +1,29 @@
-A simple socials platform for egg antifan built with Next.js, ElysiaJS, and TailwindCSS
+# Create T3 App
 
-## TODO
+This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
 
-- [x] Create a basic layout
-- [x] Create a basic API (elysia)
-- [x] Authentication (lucia)
-- [x] User profiles
-- [x] Update user profiles
-- [x] Change password
-- [x] Reset password
-- [x] Delete account
-- [x] Crete posts
-- [x] Update posts
-- [x] Delete posts
-- [x] Create comments
-- [x] Update comments
-- [x] Delete comments
-- [x] Likes
-- [x] Dislikes
-- [x] Search
-- [x] Follows
-- [x] Following feed
-- [x] SEO
+## What's next? How do I make an app with this?
 
-## Getting Started
+We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
 
-1. Clone the repository
+If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
 
-```bash
-git clone git@github.com:tiesen243/egg-community.git
-```
+- [Next.js](https://nextjs.org)
+- [NextAuth.js](https://next-auth.js.org)
+- [Prisma](https://prisma.io)
+- [Drizzle](https://orm.drizzle.team)
+- [Tailwind CSS](https://tailwindcss.com)
+- [tRPC](https://trpc.io)
 
-2. Install dependencies
+## Learn More
 
-```bash
-bun install
-```
+To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
 
-3. Add a `.env` file
+- [Documentation](https://create.t3.gg/)
+- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
 
-```bash
-touch .env
+You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
 
-# Add the following to the .env file
-DATABASE_URL=
-```
+## How do I deploy this?
 
-4. Run the development server
-
-```bash
-bun dev
-```
-
-5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-## Deploy on Vercel
-
-The easiest way to deploy this project is to use the [Vercel Platform](https://vercel.com/new?utm_source=github&utm_medium=repository&utm_campaign=tiesen243/egg-community) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.

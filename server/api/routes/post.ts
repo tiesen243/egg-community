@@ -1,11 +1,8 @@
-import Elysia from 'elysia'
-
 import { deleteFile, saveFile } from '@/lib/cloudinary'
-import { postModel } from '@/server/models/post.model'
-import { context } from '@/server/plugins'
+import { createElysia } from '@/server/api/elysia'
+import { postModel } from '@/server/api/models/post'
 
-export const postRoute = new Elysia({ name: 'Route.Post', prefix: '/post' })
-  .use(context)
+export const postRoute = createElysia({ name: 'Route.Post', prefix: '/post' })
   .use(postModel)
 
   // [POST] /api/post/get-all
@@ -22,7 +19,7 @@ export const postRoute = new Elysia({ name: 'Route.Post', prefix: '/post' })
         orderBy: { createdAt: 'desc' },
       })
 
-      if (!posts) return error(404, { message: 'Posts not found' })
+      if (!posts) return error(404, 'Posts not found')
 
       return posts.map((p) => ({
         id: p.id,
@@ -52,7 +49,7 @@ export const postRoute = new Elysia({ name: 'Route.Post', prefix: '/post' })
         },
       })
 
-      if (!post) return error(404, { message: 'Post not found' })
+      if (!post) return error(404, 'Post not found')
 
       return {
         id: post.id,
@@ -83,7 +80,7 @@ export const postRoute = new Elysia({ name: 'Route.Post', prefix: '/post' })
         orderBy: { createdAt: 'desc' },
       })
 
-      if (!posts) return error(404, { message: 'Posts not found' })
+      if (!posts) return error(404, 'Posts not found')
 
       return posts.map((p) => ({
         id: p.id,
@@ -103,14 +100,14 @@ export const postRoute = new Elysia({ name: 'Route.Post', prefix: '/post' })
   .post(
     '/create',
     async ({ db, body, user, error }) => {
-      if (!user) return error(401, { message: 'You must be logged in to create a post' })
+      if (!user) return error(401, 'You must be logged in to create a post')
       const image = body.image
         ? await saveFile(body.image, 'post').then((res) => (res?.error ? null : res?.url))
         : null
       const post = await db.post.create({
         data: { content: body.content, image, author: { connect: { id: user.id } } },
       })
-      if (!post) return error(500, { message: 'Failed to create post' })
+      if (!post) return error(500, 'Failed to create post')
       return { message: 'Post created successfully' }
     },
     { body: 'createPost' },
@@ -118,9 +115,10 @@ export const postRoute = new Elysia({ name: 'Route.Post', prefix: '/post' })
 
   // [POST] /api/post/like/:id
   .post('/like/:id', async ({ params: { id }, db, user, error }) => {
-    if (!user) return error(401, { message: 'You must be logged in to like a post' })
+    if (!user) return error(401, 'You must be logged in to like a post')
     const post = await db.post.findUnique({ where: { id } })
-    if (!post) return error(404, { message: 'Post not found' })
+
+    if (!post) return error(404, 'Post not found')
     const liked = await db.like.findFirst({ where: { postId: id, userId: user.id } })
 
     if (liked) await db.like.delete({ where: { id: liked.id } })
@@ -134,11 +132,12 @@ export const postRoute = new Elysia({ name: 'Route.Post', prefix: '/post' })
   .patch(
     '/update/:id',
     async (ctx) => {
-      if (!ctx.user) return ctx.error(401, { message: 'You must be logged in to update a post' })
+      if (!ctx.user) return ctx.error(401, 'You must be logged in to update a post')
+
       const post = await ctx.db.post.findUnique({ where: { id: ctx.params.id } })
-      if (!post) return ctx.error(404, { message: 'Post not found' })
-      if (post.authorId !== ctx.user.id)
-        return ctx.error(403, { message: 'You are not a author of this post' })
+      if (!post) return ctx.error(404, 'Post not found')
+
+      if (post.authorId !== ctx.user.id) return ctx.error(403, 'You are not a author of this post')
 
       const image = ctx.body.image
         ? await saveFile(ctx.body.image, 'post').then((res) => (res?.error ? null : res?.url))
@@ -148,7 +147,7 @@ export const postRoute = new Elysia({ name: 'Route.Post', prefix: '/post' })
         where: { id: ctx.params.id },
         data: { content: ctx.body.content, image },
       })
-      if (!post) return ctx.error(500, { message: 'Failed to update post' })
+      if (!post) return ctx.error(500, 'Failed to update post')
 
       if (post.image && image) await deleteFile(post.image)
       return { message: 'Post updated successfully' }
@@ -158,9 +157,12 @@ export const postRoute = new Elysia({ name: 'Route.Post', prefix: '/post' })
 
   // [DELETE] /api/post/delete/:id
   .delete('/delete-post/:id', async ({ db, params: { id }, user, error }) => {
-    if (!user) return error(401, { message: 'You must be logged in to delete a post' })
+    if (!user) return error(401, 'You must be logged in to delete a post')
+
     const post = await db.post.delete({ where: { id } })
-    if (!post) return error(404, { message: 'Post not found' })
-    post.image && (await deleteFile(post.image))
+    if (!post) return error(404, 'Post not found')
+
+    if (post.image) await deleteFile(post.image)
+
     return { message: 'Post deleted successfully' }
   })

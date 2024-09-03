@@ -8,30 +8,41 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
-import { Form, TextField } from '@/components/ui/form'
+import * as f from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import { api } from '@/lib/api'
+import { toast } from 'sonner'
 
 const schema = z.object({ email: z.string().email('Email is invalid') })
-
-const fields = [{ name: 'email', type: 'email', label: 'Email', placeholder: 'abc@gmail.com' }]
 
 const Page: NextPage = () => {
   const router = useRouter()
   const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
   const handleSubmit = form.handleSubmit(async (formData) => {
     const { error } = await api.user['reset-password'].patch(formData)
-    if (error) return form.setError('root', { message: error.value.message })
+    if (error) return toast.error(error.value.message)
+    toast.success('New password sent to your email')
     router.push('/')
     router.refresh()
   })
   const { isSubmitting, errors } = form.formState
 
   return (
-    <Form {...form}>
+    <f.Form {...form}>
       <form onSubmit={handleSubmit} className="w-full max-w-screen-md space-y-4 px-4">
-        {fields.map((field) => (
-          <TextField key={field.name} control={form.control} disabled={isSubmitting} {...field} />
-        ))}
+        <f.FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <f.FormItem>
+              <f.FormLabel>Email</f.FormLabel>
+              <f.FormControl>
+                <Input {...field} type="email" placeholder="abc@gmail.com" />
+              </f.FormControl>
+              <f.FormMessage />
+            </f.FormItem>
+          )}
+        />
 
         <p className="text-xs text-destructive">{errors.root?.message}</p>
 
@@ -49,7 +60,7 @@ const Page: NextPage = () => {
           Reset
         </Button>
       </form>
-    </Form>
+    </f.Form>
   )
 }
 

@@ -8,8 +8,10 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
-import { Form, TextField } from '@/components/ui/form'
+import * as f from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import { api } from '@/lib/api'
+import { toast } from 'sonner'
 
 const schema = z
   .object({
@@ -40,20 +42,32 @@ const Page: NextPage = () => {
   const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
   const handleSubmit = form.handleSubmit(async (formData) => {
     const { error } = await api.user['sign-up'].post(formData)
-    if (error) return form.setError('root', { message: error.value.message })
+    if (error) return toast.error(error.value.message)
+    toast.success('Account created successfully')
     router.push('/')
     router.refresh()
   })
   const { isSubmitting, errors } = form.formState
 
   return (
-    <Form {...form}>
+    <f.Form {...form}>
       <form onSubmit={handleSubmit} className="w-full max-w-screen-md space-y-4 px-4">
-        {fields.map((field) => (
-          <TextField key={field.name} control={form.control} disabled={isSubmitting} {...field} />
+        {fields.map((fs) => (
+          <f.FormField
+            key={fs.name}
+            control={form.control}
+            name={fs.name}
+            render={({ field }) => (
+              <f.FormItem>
+                <f.FormLabel>{fs.label}</f.FormLabel>
+                <f.FormControl>
+                  <Input {...field} {...fs} />
+                </f.FormControl>
+                <f.FormMessage />
+              </f.FormItem>
+            )}
+          />
         ))}
-
-        <p className="text-xs text-destructive">{errors.root?.message}</p>
 
         <div className="flex flex-col items-end">
           <span className="underline-offset-4 hover:*:underline">
@@ -64,12 +78,11 @@ const Page: NextPage = () => {
             Forgot your password? <Link href="/forgot-password">Reset</Link>
           </span>
         </div>
-
         <Button className="w-full" isLoading={isSubmitting}>
           Register
         </Button>
       </form>
-    </Form>
+    </f.Form>
   )
 }
 

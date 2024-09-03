@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 
 export const PostHeader: React.FC<{ authorName: string }> = ({ authorName }) => {
   const router = useRouter()
+
   return (
     <header className="container max-w-screen-md border-b py-2">
       <div className="flex items-center justify-between">

@@ -7,34 +7,38 @@ import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader } from '@/components/ui/card'
-import { Form, TextField } from '@/components/ui/form'
+import * as f from '@/components/ui/form'
 import { api } from '@/lib/api'
 import { revalidate } from '@/lib/revalidate'
+import { Input } from './ui/input'
 
 const schema = z.object({ content: z.string().min(1, 'Content is required') })
 export const CreateComment: React.FC<{ postId: string }> = ({ postId }) => {
   const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
-  const handleSubmit = form.handleSubmit(async (formData) => {
-    await api.comment({ id: postId }).post(formData)
+  const handleSubmit = form.handleSubmit(async (values) => {
+    await api.comment({ id: postId }).post(values)
     form.reset({ content: '' })
-    revalidate('posts')
+    await revalidate('posts')
   })
   const isPending = form.formState.isSubmitting
 
   return (
-    <Form {...form}>
+    <f.Form {...form}>
       <form
         onSubmit={handleSubmit}
         className="fixed bottom-0 z-20 -ml-8 w-full max-w-screen-md md:px-8"
       >
         <Card className="w-full rounded-none">
           <CardHeader className="flex-row items-center gap-2 space-y-0 p-4">
-            <TextField
+            <f.FormField
               name="content"
               control={form.control}
-              placeholder="Write a comment"
               disabled={isPending}
-              classes={{ item: 'w-full' }}
+              render={({ field }) => (
+                <f.FormControl className="flex-grow">
+                  <Input {...field} placeholder="Write a comment..." className="w-full" />
+                </f.FormControl>
+              )}
             />
             <Button size="icon" isLoading={isPending}>
               <SendHorizonalIcon />
@@ -42,6 +46,6 @@ export const CreateComment: React.FC<{ postId: string }> = ({ postId }) => {
           </CardHeader>
         </Card>
       </form>
-    </Form>
+    </f.Form>
   )
 }

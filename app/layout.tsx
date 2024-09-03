@@ -1,24 +1,37 @@
-import { Inter } from 'next/font/google'
+import '@/app/globals.css'
 
-import { Provider } from '@/components/provider'
+import { GeistSans } from 'geist/font/sans'
+import { ThemeProvider } from 'next-themes'
+
 import { Toaster } from '@/components/ui/sonner'
-import { siteConfig } from '@/lib/site'
-import './globals.css'
+import { seo } from '@/lib/seo'
+import { cn } from '@/lib/utils'
+import { SessionProvider } from '@/lib/session'
+import { auth } from '@/server/auth'
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
+export const metadata = seo({})
+export const viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: 'hsl(0, 0%, 100%)' },
+    { media: '(prefers-color-scheme: dark)', color: 'hsl(240, 10%, 3.9%)' },
+  ],
+}
 
-export const metadata = siteConfig.meta
-export const viewport = siteConfig.viewport
+const RootLayout: React.FC<React.PropsWithChildren> = async ({ children }) => {
+  const { session, user } = await auth()
 
-const RootLayout: React.FC<React.PropsWithChildren> = ({ children }) => (
-  <html lang="en" suppressHydrationWarning>
-    <body className={`font-sans ${inter.variable}`}>
-      <Provider>
-        {children}
-        <Toaster />
-      </Provider>
-    </body>
-  </html>
-)
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body className={cn(`font-san`, GeistSans.variable)}>
+        <ThemeProvider attribute="class" defaultTheme="dark" disableTransitionOnChange>
+          <SessionProvider session={session} user={user}>
+            {children}
+          </SessionProvider>
+          <Toaster richColors />
+        </ThemeProvider>
+      </body>
+    </html>
+  )
+}
 
 export default RootLayout

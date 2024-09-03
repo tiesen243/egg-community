@@ -1,12 +1,19 @@
+'use client'
+
+import * as React from 'react'
 import type * as LabelPrimitive from '@radix-ui/react-label'
 import { Slot } from '@radix-ui/react-slot'
-import * as React from 'react'
-import type { ControllerProps, FieldPath, FieldValues } from 'react-hook-form'
-import { Controller, FormProvider, useFormContext } from 'react-hook-form'
+import {
+  Controller,
+  type ControllerProps,
+  type FieldPath,
+  type FieldValues,
+  FormProvider,
+  useFormContext,
+} from 'react-hook-form'
 
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
+import { Label } from '@/components/ui/label'
 
 const Form = FormProvider
 
@@ -150,85 +157,13 @@ const FormMessage = React.forwardRef<
 })
 FormMessage.displayName = 'FormMessage'
 
-interface FieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  name: string
-  control: ControllerProps['defaultValue']
-  label?: string
-  description?: string
-  asChild?: boolean
-  classes?: {
-    item?: string
-    label?: string
-    description?: string
-    message?: string
-  }
-}
-const TextField: React.FC<FieldProps> = ({
-  name,
-  control,
-  label = '',
-  description = '',
-  asChild = false,
-  classes,
-  ...props
-}) => {
-  const Comp = asChild ? Slot : Input
-
-  return (
-    <FormField
-      control={control}
-      name={name}
-      render={({ field }) => (
-        <FormItem className={classes?.item}>
-          {label && <FormLabel className={classes?.label}>{label}</FormLabel>}
-          <FormControl>
-            <Comp {...field} {...props} />
-          </FormControl>
-          {description && (
-            <FormDescription className={classes?.description}>{description}</FormDescription>
-          )}
-          <FormMessage className={classes?.message} />
-        </FormItem>
-      )}
-    />
-  )
-}
-
-const FileField: React.FC<FieldProps> = ({ name, control, label, ...props }) => (
-  <FormField
-    control={control}
-    name={name}
-    render={({ field: { onChange, value: _, ...field } }) => {
-      return (
-        <FormItem>
-          <FormLabel>{label}</FormLabel>
-          <FormControl>
-            <Input
-              type="file"
-              onChange={(event) => {
-                if (!event.target.files) return
-                onChange(event.target.files[0])
-              }}
-              {...field}
-              {...props}
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )
-    }}
-  />
-)
-
 export {
-  FileField,
+  useFormField,
   Form,
-  FormControl,
-  FormDescription,
-  FormField,
   FormItem,
   FormLabel,
+  FormControl,
+  FormDescription,
   FormMessage,
-  TextField,
-  useFormField,
+  FormField,
 }
