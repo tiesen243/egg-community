@@ -6,7 +6,7 @@ import { auth } from '@/server/auth'
 
 const Page: NextPage = async () => {
   const { user } = await auth()
-  const { data, error } = await api.post['get-all'].get({
+  const { data, error } = await api.post.getAll.get({
     query: { id: user?.id ?? '' },
     fetch: { next: { tags: ['posts'] } },
   })

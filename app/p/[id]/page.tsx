@@ -4,13 +4,13 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { CommentMenu } from '@/components/comment-menu'
-import { CreateComment } from '@/components/create-comment'
 import { LikeBtn } from '@/components/like-btn'
-import { PostHeader } from '@/components/post-header'
 import { PostMenu } from '@/components/post-menu'
 import { api } from '@/lib/api'
 import { seo } from '@/lib/seo'
 import { auth } from '@/server/auth'
+import { CreateComment } from './_create-comment'
+import { PostHeader } from './_post-header'
 
 interface Props {
   params: { id: string }
@@ -19,7 +19,7 @@ interface Props {
 const Page: NextPage<Props> = async ({ params: { id } }) => {
   const { user } = await auth()
 
-  const { data, error } = await api.post['get-one']({ id }).get({
+  const { data, error } = await api.post.getOne({ id }).get({
     query: { id: user?.id ?? '' },
     fetch: { next: { tags: ['posts'] } },
   })
@@ -87,7 +87,7 @@ const Page: NextPage<Props> = async ({ params: { id } }) => {
         <ul className="mb-20 space-y-4">
           {data.commentsList?.map((c) => (
             <li key={c.id} className="border-b">
-              {c.authorId === user?.id && <CommentMenu id={c.id} content={c.content} />}
+              {c.author.id === user?.id && <CommentMenu id={c.id} content={c.content} />}
               <Link href={`/u/${c.author.id}`} className="flex items-center gap-4">
                 <Image
                   src={c.author.image ?? '/og'}
@@ -122,7 +122,7 @@ export const generateMetadata = async (
   { params }: Props,
   parent: ResolvingMetadata,
 ): Promise<Metadata> => {
-  const { data, error } = await api.post['get-one']({ id: params.id }).get({ query: {} })
+  const { data, error } = await api.post.getOne({ id: params.id }).get({ query: {} })
   if (!data || error) return { title: 'Error' }
   const previousImages = (await parent).openGraph?.images ?? []
 

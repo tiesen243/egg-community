@@ -2,16 +2,15 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { NextPage } from 'next'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import * as f from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { api } from '@/lib/api'
-import { toast } from 'sonner'
 
 const schema = z.object({ email: z.string().email('Email is invalid') })
 
@@ -19,7 +18,7 @@ const Page: NextPage = () => {
   const router = useRouter()
   const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
   const handleSubmit = form.handleSubmit(async (formData) => {
-    const { error } = await api.user['reset-password'].patch(formData)
+    const { error } = await api.user.resetPassword.patch(formData)
     if (error) return toast.error(error.value)
     toast.success('New password sent to your email')
     router.push('/')
@@ -46,11 +45,12 @@ const Page: NextPage = () => {
 
         <div className="flex flex-col items-end">
           <span className="underline-offset-4 hover:*:underline">
-            Already have an account? <Link href="/login">Login</Link>
+            Already have an account? <button onClick={() => router.push('/login')}>Login</button>
           </span>
 
           <span className="underline-offset-4 hover:*:underline">
-            Don&apos;t have an account? <Link href="/register">Register</Link>
+            Don&apos;t have an account?{' '}
+            <button onClick={() => router.push('/register')}>Register</button>
           </span>
         </div>
 

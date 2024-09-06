@@ -12,7 +12,7 @@ import * as form_1 from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { api } from '@/lib/api'
-import { revalidate } from '@/lib/revalidate'
+import { revalidate } from '@/server/actions'
 import { fileToBase64 } from '@/lib/utils'
 
 const schema = z.object({
@@ -30,7 +30,7 @@ export const CreatePost: React.FC = () => {
     })
     form.reset()
     setOpen(false)
-    await revalidate('posts')
+    await revalidate({ tag: 'posts' })
   })
   const isPending = form.formState.isSubmitting
 

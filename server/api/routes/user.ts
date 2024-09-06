@@ -1,18 +1,18 @@
 import { Scrypt } from 'lucia'
 import { cookies } from 'next/headers'
 
-import { deleteFile, saveFile } from '@/lib/cloudinary'
 import { createElysia } from '@/server/api/elysia'
 import { userModel } from '@/server/api/models/user'
 import { lucia } from '@/server/auth/lucia'
+import { deleteFile, saveFile } from '@/server/cloudinary'
 import { sendEmail } from '@/server/email/action'
 
 export const userRoute = createElysia({ name: 'Route.User', prefix: '/user' })
   .use(userModel)
 
-  // [GET] /api/user/get-all
+  // [GET] /api/user/getAll
   .get(
-    '/get-all',
+    '/getAll',
     async ({ db, query, error }) => {
       const users = await db.user.findMany({
         where: query.keyword ? { name: { contains: query.keyword, mode: 'insensitive' } } : {},
@@ -23,12 +23,13 @@ export const userRoute = createElysia({ name: 'Route.User', prefix: '/user' })
 
       return users
     },
-    { query: 'getUsers' },
+    { query: 'getUsers', response: { 200: 'getUsersRes', 404: 'e' } },
   )
 
   // [GET] /api/user/:id
   .get(
-    '/info/:id',
+    '/:id',
+    // @ts-expect-error - Ignore
     async ({ db, params: { id }, query, error }) => {
       const user = await db.user.findUnique({
         where: { id },
@@ -65,34 +66,42 @@ export const userRoute = createElysia({ name: 'Route.User', prefix: '/user' })
 
       return { ...user, password: '', posts, isFollowing: !!isFollowing }
     },
-    { query: 'getUser' },
+    { query: 'getUser', response: { 200: 'getUserRes', 404: 'e' } },
   )
 
   // [GET] /api/user/:id/following
-  .get('/:id/following', async ({ db, params: { id }, error }) => {
-    const user = await db.user.findUnique({
-      where: { id },
-      include: { following: { select: { id: true, name: true, image: true } } },
-    })
-    if (!user) return error(404, 'User not found')
+  .get(
+    '/:id/following',
+    async ({ db, params: { id }, error }) => {
+      const user = await db.user.findUnique({
+        where: { id },
+        include: { following: { select: { id: true, name: true, image: true } } },
+      })
+      if (!user) return error(404, 'User not found')
 
-    return { name: user.name, users: user.following }
-  })
+      return { name: user.name, users: user.following }
+    },
+    { response: { 200: 'getFollowRes', 404: 'e' } },
+  )
 
   // [GET] /api/user/:id/followers
-  .get('/:id/followers', async ({ db, params: { id }, error }) => {
-    const user = await db.user.findUnique({
-      where: { id },
-      include: { followers: { select: { id: true, name: true, image: true } } },
-    })
-    if (!user) return error(404, 'User not found')
+  .get(
+    '/:id/followers',
+    async ({ db, params: { id }, error }) => {
+      const user = await db.user.findUnique({
+        where: { id },
+        include: { followers: { select: { id: true, name: true, image: true } } },
+      })
+      if (!user) return error(404, 'User not found')
 
-    return { name: user.name, users: user.followers }
-  })
+      return { name: user.name, users: user.followers }
+    },
+    { response: { 200: 'getFollowRes', 404: 'e' } },
+  )
 
-  // [POST] /api/user/sign-up
+  // [POST] /api/user/signUp
   .post(
-    '/sign-up',
+    '/signUp',
     async ({ db, body, error }) => {
       const { name, email } = body
       const user = await db.user.findUnique({ where: { email } })
@@ -106,12 +115,12 @@ export const userRoute = createElysia({ name: 'Route.User', prefix: '/user' })
 
       return { message: 'User created successfully' }
     },
-    { body: 'signUp' },
+    { body: 'signUp', response: { 200: 'res', 409: 'e', 500: 'e' } },
   )
 
-  // [POST] /api/user/sign-in
+  // [POST] /api/user/signIn
   .post(
-    '/sign-in',
+    '/signIn',
     async ({ body: { email, password }, db, error }) => {
       const user = await db.user.findUnique({ where: { email: email } })
       if (!user) return error(404, 'User not found')
@@ -125,11 +134,11 @@ export const userRoute = createElysia({ name: 'Route.User', prefix: '/user' })
 
       return { message: 'User signed in successfully' }
     },
-    { body: 'signIn' },
+    { body: 'signIn', response: { 200: 'res', 401: 'e', 404: 'e' } },
   )
 
-  // [POST] /api/user/sign-out
-  .post('/sign-out', async () => {
+  // [POST] /api/user/signOut
+  .post('/signOut', async () => {
     const sessionCookie = lucia.createBlankSessionCookie()
     cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
   })
@@ -166,7 +175,7 @@ export const userRoute = createElysia({ name: 'Route.User', prefix: '/user' })
         addedFollow,
       }
     },
-    { body: 'getUser' },
+    { body: 'getUser', response: { 200: 'res', 401: 'e', 404: 'e' } },
   )
 
   // [PATCH] /api/user/update
@@ -192,12 +201,12 @@ export const userRoute = createElysia({ name: 'Route.User', prefix: '/user' })
       if (body.avatar && user?.image) await deleteFile(user.image)
       return { message: 'User updated successfully' }
     },
-    { body: 'update' },
+    { body: 'update', response: { 200: 'res', 401: 'e', 500: 'e' } },
   )
 
-  // [PATCH] /api/user/change-password
+  // [PATCH] /api/user/changePassword
   .patch(
-    '/change-password',
+    '/changePassword',
     async ({ db, user, body, error }) => {
       if (!user) return error(401, 'Unauthorized')
 
@@ -212,12 +221,12 @@ export const userRoute = createElysia({ name: 'Route.User', prefix: '/user' })
 
       return { message: 'Password changed successfully' }
     },
-    { body: 'changePassword' },
+    { body: 'changePassword', response: { 200: 'res', 401: 'e', 500: 'e' } },
   )
 
-  // [PATCH] /api/user/reset-password
+  // [PATCH] /api/user/resetPassword
   .patch(
-    '/reset-password',
+    '/resetPassword',
     async ({ db, body, error }) => {
       const user = await db.user.findUnique({ where: { email: body.email } })
       if (!user) return error(404, 'User not found')
@@ -238,12 +247,12 @@ export const userRoute = createElysia({ name: 'Route.User', prefix: '/user' })
 
       return { message: 'Password reset successfully' }
     },
-    { body: 'resetPassword' },
+    { body: 'resetPassword', response: { 200: 'res', 404: 'e', 500: 'e' } },
   )
 
-  // [DELETE] /api/user/delete
+  // [DELETE] /api/user/deleteAccount
   .delete(
-    '/delete-account',
+    '/deleteAccount',
     async ({ db, user, body: { password }, error }) => {
       if (!user) return error(401, 'You are not authorized')
 
@@ -263,5 +272,5 @@ export const userRoute = createElysia({ name: 'Route.User', prefix: '/user' })
 
       return { message: 'User deleted successfully' }
     },
-    { body: 'deleteAccount' },
+    { body: 'deleteAccount', response: { 200: 'res', 401: 'e', 500: 'e' } },
   )

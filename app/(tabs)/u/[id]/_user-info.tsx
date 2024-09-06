@@ -3,23 +3,12 @@ import Link from 'next/link'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { FollowBtn } from '@/components/follow-btn'
+import type { User } from '@/server/api/models/user'
+import { FollowBtn } from './_follow-btn'
 
 interface Props {
   id?: string
-  user: {
-    id: string
-    name: string
-    bio: string | null
-    image: string | null
-    createdAt: Date
-    _count: {
-      posts: number
-      followers: number
-      following: number
-    }
-    isFollowing: boolean
-  }
+  user: User
 }
 
 export const UserInfo: React.FC<Props> = ({ id, user }) => (

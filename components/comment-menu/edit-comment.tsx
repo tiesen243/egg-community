@@ -3,11 +3,11 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
-import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import * as d from '@/components/ui/dialog'
 import * as f from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { api } from '@/lib/api'
-import { revalidate } from '@/lib/revalidate'
+import { revalidate } from '@/server/actions'
 
 interface Props {
   id: string
@@ -22,15 +22,15 @@ export const EditComment: React.FC<Props> = (props) => {
   const handleSubmit = form.handleSubmit(async (formData) => {
     await api.comment({ id: props.id }).patch(formData)
     props.setOpen(false)
-    await revalidate('posts')
+    await revalidate({ tag: 'posts' })
   })
   const isPending = form.formState.isSubmitting
 
   return (
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>Edit your comment</DialogTitle>
-      </DialogHeader>
+    <d.DialogContent>
+      <d.DialogHeader>
+        <d.DialogTitle>Edit your comment</d.DialogTitle>
+      </d.DialogHeader>
 
       <f.Form {...form}>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -49,11 +49,11 @@ export const EditComment: React.FC<Props> = (props) => {
             )}
           />
 
-          <DialogFooter>
+          <d.DialogFooter>
             <Button isLoading={isPending}>Save</Button>
-          </DialogFooter>
+          </d.DialogFooter>
         </form>
       </f.Form>
-    </DialogContent>
+    </d.DialogContent>
   )
 }

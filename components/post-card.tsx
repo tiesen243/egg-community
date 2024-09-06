@@ -2,31 +2,16 @@ import { MessageSquareIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import { LikeBtn } from '@/components/like-btn'
+import * as card from '@/components/ui/card'
+import type { TPostCard } from '@/server/api/models/post'
 
 interface Props {
-  post: {
-    id: string
-    content: string
-    image: string | null
-    createdAt: Date
-    author: { id: string; name: string; image: string | null }
-    isLiked: boolean
-    likes: number
-    comments: number
-  }
+  post: TPostCard[0]
 }
 
 export const PostCard: React.FC<Props> = ({ post }) => (
-  <Card className="group border-none">
+  <card.Card className="group border-none">
     <div className="absolute left-5 top-0 h-full w-[2px] bg-muted transition-colors ease-linear group-hover:bg-primary" />
 
     <Link
@@ -42,20 +27,20 @@ export const PostCard: React.FC<Props> = ({ post }) => (
       />
 
       <div>
-        <CardTitle className="text-lg">{post.author.name}</CardTitle>
-        <CardDescription>{new Date(post.createdAt).toDateString()}</CardDescription>
+        <card.CardTitle className="text-lg">{post.author.name}</card.CardTitle>
+        <card.CardDescription>{new Date(post.createdAt).toDateString()}</card.CardDescription>
       </div>
     </Link>
 
     <Link href={`/p/${post.id}`}>
-      <CardHeader className="line-clamp-2 pb-0 pl-16 pt-14">
+      <card.CardHeader className="line-clamp-2 pb-0 pl-16 pt-14">
         {post.content.split('\n').map((c, i) => (
           <p key={i}>{c}</p>
         ))}
-      </CardHeader>
+      </card.CardHeader>
 
       {post.image && (
-        <CardContent className="pl-16 pt-2">
+        <card.CardContent className="pl-16 pt-2">
           <Image
             src={post.image}
             alt={post.content}
@@ -63,17 +48,17 @@ export const PostCard: React.FC<Props> = ({ post }) => (
             height={300}
             className="rounded-lg shadow-lg"
           />
-        </CardContent>
+        </card.CardContent>
       )}
     </Link>
 
-    <CardFooter className={`gap-4 pl-16 ${post.image ? '' : 'pt-2'}`}>
+    <card.CardFooter className={`gap-4 pl-16 ${post.image ? '' : 'pt-2'}`}>
       <LikeBtn {...post} />
 
       <div className="flex gap-2">
         <MessageSquareIcon />
         {post.comments}
       </div>
-    </CardFooter>
-  </Card>
+    </card.CardFooter>
+  </card.Card>
 )

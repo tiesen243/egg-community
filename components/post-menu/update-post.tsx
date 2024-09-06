@@ -12,8 +12,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { api } from '@/lib/api'
-import { revalidate } from '@/lib/revalidate'
 import { fileToBase64 } from '@/lib/utils'
+import { revalidate } from '@/server/actions'
 
 export const UpdatePostTrigger: React.FC = () => (
   <DialogTrigger asChild>

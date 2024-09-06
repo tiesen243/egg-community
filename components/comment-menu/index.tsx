@@ -4,15 +4,7 @@ import { EllipsisIcon, PencilIcon } from 'lucide-react'
 import { useState } from 'react'
 
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import * as dm from '@/components/ui/dropdown-menu'
 import { DeleteComment } from './delete-comment'
 import { EditComment } from './edit-comment'
 
@@ -25,25 +17,25 @@ export const CommentMenu: React.FC<Props> = ({ id, content }) => {
   const [open, setOpen] = useState<boolean>(false)
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DropdownMenu>
-        <DropdownMenuTrigger className="absolute right-0 top-0 z-20">
+      <dm.DropdownMenu>
+        <dm.DropdownMenuTrigger className="absolute right-0 top-0 z-20">
           <EllipsisIcon className="z-20 hover:text-muted-foreground" />
-        </DropdownMenuTrigger>
+        </dm.DropdownMenuTrigger>
 
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Action</DropdownMenuLabel>
-          <DropdownMenuSeparator />
+        <dm.DropdownMenuContent align="end">
+          <dm.DropdownMenuLabel>Action</dm.DropdownMenuLabel>
+          <dm.DropdownMenuSeparator />
 
-          <DropdownMenuGroup>
+          <dm.DropdownMenuGroup>
             <DialogTrigger asChild>
-              <DropdownMenuItem>
+              <dm.DropdownMenuItem>
                 <PencilIcon className="mr-2" /> Edit
-              </DropdownMenuItem>
+              </dm.DropdownMenuItem>
             </DialogTrigger>
             <DeleteComment id={id} />
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+          </dm.DropdownMenuGroup>
+        </dm.DropdownMenuContent>
+      </dm.DropdownMenu>
 
       <EditComment id={id} content={content} setOpen={setOpen} />
     </Dialog>

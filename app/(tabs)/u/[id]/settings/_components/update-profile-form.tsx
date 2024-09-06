@@ -7,11 +7,11 @@ import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import * as f from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { api } from '@/lib/api'
-import { revalidate } from '@/lib/revalidate'
+import { revalidate } from '@/server/actions'
 import { fileToBase64 } from '@/lib/utils'
-import { Input } from './ui/input'
 
 interface Props {
   user: {
@@ -36,7 +36,7 @@ export const UpdateProfileForm: React.FC<Props> = ({ user }) => {
     })
     if (error) return toast.error(error.value)
     toast.success(data.message)
-    await revalidate('user')
+    await revalidate({ tag: 'user' })
   })
   const isPending = form.formState.isSubmitting
 

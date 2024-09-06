@@ -4,7 +4,7 @@ import { HeartIcon } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { api } from '@/lib/api'
-import { revalidate } from '@/lib/revalidate'
+import { revalidate } from '@/server/actions'
 
 interface Props {
   id: string
@@ -16,7 +16,7 @@ export const LikeBtn: React.FC<Props> = (props) => {
   const handleClick = async () => {
     const { error } = await api.post.like({ id: props.id }).post()
     if (error) return toast.error(error.value)
-    revalidate('posts')
+    await revalidate({ tag: 'posts' })
   }
 
   return (

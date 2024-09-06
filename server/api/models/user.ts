@@ -1,4 +1,4 @@
-import Elysia, { t } from 'elysia'
+import Elysia, { t, UnwrapSchema } from 'elysia'
 
 const getUsers = t.Partial(t.Object({ keyword: t.String() }))
 
@@ -36,6 +36,49 @@ const deleteAccount = t.Object({
   confirm: t.String(),
 })
 
+const e = t.String({})
+const res = t.Object({ message: t.String(), addedFollow: t.Optional(t.Boolean()) })
+
+const getUsersRes = t.Array(
+  t.Object({ id: t.String(), name: t.String(), image: t.Union([t.String(), t.Null()]) }),
+)
+
+const getUserRes = t.Object({
+  id: t.String(),
+  name: t.String(),
+  email: t.String(),
+  bio: t.String(),
+  image: t.Union([t.String(), t.Null()]),
+  _count: t.Object({ posts: t.Number(), followers: t.Number(), following: t.Number() }),
+  isFollowing: t.Boolean(),
+  createdAt: t.Date(),
+  posts: t.Array(
+    t.Object({
+      id: t.String(),
+      content: t.String(),
+      image: t.Union([t.String(), t.Null()]),
+      createdAt: t.Date(),
+      author: t.Object({
+        id: t.String(),
+        name: t.String(),
+        image: t.Union([t.String(), t.Null()]),
+      }),
+      isLiked: t.Boolean(),
+      likes: t.Number(),
+      comments: t.Number(),
+    }),
+  ),
+})
+
+export type User = UnwrapSchema<typeof getUserRes>
+
+const getFollowRes = t.Object({
+  name: t.String(),
+  users: t.Array(
+    t.Object({ id: t.String(), name: t.String(), image: t.Union([t.String(), t.Null()]) }),
+  ),
+})
+
 export const userModel = new Elysia({ name: 'Model.User' }).model({
   getUsers,
   getUser,
@@ -45,4 +88,11 @@ export const userModel = new Elysia({ name: 'Model.User' }).model({
   changePassword,
   resetPassword,
   deleteAccount,
+
+  // Response
+  e,
+  res,
+  getUsersRes,
+  getUserRes,
+  getFollowRes,
 })

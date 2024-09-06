@@ -11,27 +11,17 @@ import * as f from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { api } from '@/lib/api'
 
-const schema = z
-  .object({
-    oldPassword: z.string().min(8, { message: 'Password must be at least 8 characters' }),
-    newPassword: z.string().min(8, { message: 'Password must be at least 8 characters' }),
-    confirmNewPassword: z.string().min(8, { message: 'Password must be at least 8 characters' }),
-  })
-  .refine((data) => data.newPassword === data.confirmNewPassword, {
-    message: 'Passwords do not match',
-  })
-
 export const ChangePasswordForm: React.FC = () => {
   const router = useRouter()
   const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
   const handleSubmit = form.handleSubmit(async (values) => {
-    const { data, error } = await api.user['change-password'].patch(values)
+    const { data, error } = await api.user.changePassword.patch(values)
     if (error) return toast.error(error.value)
 
     toast.success(data.message, {
       description: 'You will be redirected to the login page',
     })
-    await api.user['sign-out'].post()
+    await api.user.signOut.post()
     router.push('/login')
     router.refresh()
   })
@@ -63,6 +53,16 @@ export const ChangePasswordForm: React.FC = () => {
     </f.Form>
   )
 }
+
+const schema = z
+  .object({
+    oldPassword: z.string().min(8, { message: 'Password must be at least 8 characters' }),
+    newPassword: z.string().min(8, { message: 'Password must be at least 8 characters' }),
+    confirmNewPassword: z.string().min(8, { message: 'Password must be at least 8 characters' }),
+  })
+  .refine((data) => data.newPassword === data.confirmNewPassword, {
+    message: 'Passwords do not match',
+  })
 
 const fields = [
   {

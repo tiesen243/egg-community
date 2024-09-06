@@ -1,9 +1,9 @@
 import type { NextPage } from 'next'
 import { redirect } from 'next/navigation'
 
-import { ChangePasswordForm } from '@/components/change-password-form'
-import { DeleteAccount } from '@/components/delete-account'
-import { UpdateProfileForm } from '@/components/update-profile-form'
+import { ChangePasswordForm } from './_components/change-password-form'
+import { DeleteAccount } from './_components/delete-account'
+import { UpdateProfileForm } from './_components/update-profile-form'
 import { auth } from '@/server/auth'
 
 interface Props {

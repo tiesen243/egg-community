@@ -2,16 +2,15 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { NextPage } from 'next'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import * as f from '@/components/ui/form'
-import { api } from '@/lib/api'
 import { Input } from '@/components/ui/input'
-import { toast } from 'sonner'
+import { api } from '@/lib/api'
 
 const schema = z.object({
   email: z.string().email('Email is invalid'),
@@ -22,7 +21,7 @@ const Page: NextPage = () => {
   const router = useRouter()
   const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
   const handleSubmit = form.handleSubmit(async (formData) => {
-    const { error } = await api.user['sign-in'].post(formData)
+    const { error } = await api.user.signIn.post(formData)
     if (error) return toast.error(error.value)
     toast.success('Logged in successfully')
     router.push('/')
@@ -53,11 +52,12 @@ const Page: NextPage = () => {
 
         <div className="flex flex-col items-end">
           <span className="underline-offset-4 hover:*:underline">
-            Already have an account? <Link href="/login">Login</Link>
+            Already have an account? <button onClick={() => router.push('/login')}>Login</button>
           </span>
 
           <span className="underline-offset-4 hover:*:underline">
-            Forgot your password? <Link href="/forgot-password">Reset</Link>
+            Forgot your password?{' '}
+            <button onClick={() => router.push('/forgot-password')}>Reset</button>
           </span>
         </div>
 

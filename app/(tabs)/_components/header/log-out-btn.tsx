@@ -9,10 +9,11 @@ import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 export const LogOutBtn: React.FC = () => {
   const router = useRouter()
   const logOut = async () => {
-    await api.user['sign-out'].post()
+    await api.user.signOut.post()
     router.push('/')
     router.refresh()
   }
+
   return (
     <DropdownMenuItem onClick={logOut}>
       <LogOutIcon className="mr-2" /> Log Out

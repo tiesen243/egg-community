@@ -16,7 +16,7 @@ export const DeleteAccount: React.FC = () => {
   const router = useRouter()
   const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
   const handleSubmit = form.handleSubmit(async (formData) => {
-    const { data, error } = await api.user['delete-account'].delete(formData)
+    const { data, error } = await api.user.deleteAccount.delete(formData)
     if (error) return toast.error(error.value)
     toast.success(data.message)
     router.push('/login')
@@ -74,6 +74,12 @@ export const DeleteAccount: React.FC = () => {
     </dialog.Dialog>
   )
 }
+const schema = z.object({
+  confirm: z.string().refine((value) => value === 'delete my account', {
+    message: 'Please type "delete my account" to confirm',
+  }),
+  password: z.string().min(8, { message: 'Password must be at least 8 characters' }),
+})
 
 const fields = [
   {
@@ -88,10 +94,3 @@ const fields = [
     type: 'password',
   },
 ]
-
-const schema = z.object({
-  confirm: z.string().refine((value) => value === 'delete my account', {
-    message: 'Please type "delete my account" to confirm',
-  }),
-  password: z.string().min(8, { message: 'Password must be at least 8 characters' }),
-})

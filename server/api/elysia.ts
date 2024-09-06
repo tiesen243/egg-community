@@ -11,4 +11,4 @@ const createContext = new Elysia()
   .as('plugin')
 
 export const createElysia = <P extends string, S extends boolean>(c?: ElysiaConfig<P, S>) =>
-  new Elysia(c).use(createContext)
+  new Elysia({ ...c, normalize: true }).use(createContext)

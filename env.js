@@ -12,7 +12,7 @@ export const env = createEnv({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     RESEND_KEY: z.string(),
     DATABASE_URL: z.string().url(),
-    VERCEL_PROJECT_PRODUCTION_URL: z.string(),
+    VERCEL_PROJECT_PRODUCTION_URL: z.string().optional(),
 
     CLD_NAME: z.string(),
     CLD_API_KEY: z.string(),

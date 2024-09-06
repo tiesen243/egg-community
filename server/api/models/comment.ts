@@ -10,7 +10,13 @@ const updateComment = t.Partial(
   }),
 )
 
+const e = t.String()
+
 export const commentModel = new Elysia({ name: 'Model.Comment' }).model({
+  // Resquest
   createComment,
   updateComment,
+
+  // Response
+  e,
 })

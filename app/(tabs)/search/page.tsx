@@ -23,8 +23,8 @@ const Page: NextPage<Props> = async ({ searchParams: { keyword } }) => {
     redirect(`/search?keyword=${keyword}`)
   }
 
-  const { data: posts } = await api.post['get-all'].get({ query: { keyword, id: user?.id } })
-  const { data: users } = await api.user['get-all'].get({ query: { keyword } })
+  const { data: posts } = await api.post.getAll.get({ query: { keyword, id: user?.id } })
+  const { data: users } = await api.user.getAll.get({ query: { keyword } })
 
   return (
     <>

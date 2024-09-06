@@ -1,13 +1,13 @@
-import { deleteFile, saveFile } from '@/lib/cloudinary'
 import { createElysia } from '@/server/api/elysia'
 import { postModel } from '@/server/api/models/post'
+import { deleteFile, saveFile } from '@/server/cloudinary'
 
 export const postRoute = createElysia({ name: 'Route.Post', prefix: '/post' })
   .use(postModel)
 
-  // [POST] /api/post/get-all
+  // [POST] /api/post/getAll
   .get(
-    '/get-all',
+    '/getAll',
     async ({ db, query, error }) => {
       const posts = await db.post.findMany({
         where: query.keyword ? { content: { contains: query.keyword, mode: 'insensitive' } } : {},
@@ -32,12 +32,13 @@ export const postRoute = createElysia({ name: 'Route.Post', prefix: '/post' })
         comments: p._count.comments,
       }))
     },
-    { query: 'get' },
+    { query: 'get', response: { 200: 'postCard', 404: 'e' } },
   )
 
-  // [GET] /api/post/get-one/:id
+  // [GET] /api/post/getOne/:id
   .get(
-    '/get-one/:id',
+    '/getOne/:id',
+    // @ts-expect-error - query type is not defined
     async ({ db, params: { id }, query, error }) => {
       const post = await db.post.findUnique({
         where: { id },
@@ -63,12 +64,12 @@ export const postRoute = createElysia({ name: 'Route.Post', prefix: '/post' })
         commentsList: post.comments,
       }
     },
-    { query: 'get' },
+    { query: 'get', response: { 200: 'postDetail', 404: 'e' } },
   )
 
-  // [GET] /api/post/get-by-following
+  // [GET] /api/post/getByFollowing
   .get(
-    '/get-by-following',
+    '/getByFollowing',
     async ({ db, query, error }) => {
       const posts = await db.post.findMany({
         where: { author: { followers: { some: { id: query.id } } } },
@@ -93,7 +94,7 @@ export const postRoute = createElysia({ name: 'Route.Post', prefix: '/post' })
         comments: p._count.comments,
       }))
     },
-    { query: 'get' },
+    { query: 'get', response: { 200: 'postCard', 404: 'e' } },
   )
 
   // [POST] /api/post/create
@@ -114,19 +115,23 @@ export const postRoute = createElysia({ name: 'Route.Post', prefix: '/post' })
   )
 
   // [POST] /api/post/like/:id
-  .post('/like/:id', async ({ params: { id }, db, user, error }) => {
-    if (!user) return error(401, 'You must be logged in to like a post')
-    const post = await db.post.findUnique({ where: { id } })
+  .post(
+    '/like/:id',
+    async ({ params: { id }, db, user, error }) => {
+      if (!user) return error(401, 'You must be logged in to like a post')
+      const post = await db.post.findUnique({ where: { id } })
 
-    if (!post) return error(404, 'Post not found')
-    const liked = await db.like.findFirst({ where: { postId: id, userId: user.id } })
+      if (!post) return error(404, 'Post not found')
+      const liked = await db.like.findFirst({ where: { postId: id, userId: user.id } })
 
-    if (liked) await db.like.delete({ where: { id: liked.id } })
-    else
-      await db.like.create({
-        data: { post: { connect: { id } }, user: { connect: { id: user.id } } },
-      })
-  })
+      if (liked) await db.like.delete({ where: { id: liked.id } })
+      else
+        await db.like.create({
+          data: { post: { connect: { id } }, user: { connect: { id: user.id } } },
+        })
+    },
+    { response: { 401: 'e', 404: 'e' } },
+  )
 
   // [PATCH] /api/post/update/:id
   .patch(
@@ -152,17 +157,21 @@ export const postRoute = createElysia({ name: 'Route.Post', prefix: '/post' })
       if (post.image && image) await deleteFile(post.image)
       return { message: 'Post updated successfully' }
     },
-    { body: 'updatePost' },
+    { body: 'updatePost', response: { 401: 'e', 403: 'e', 404: 'e', 500: 'e' } },
   )
 
-  // [DELETE] /api/post/delete/:id
-  .delete('/delete-post/:id', async ({ db, params: { id }, user, error }) => {
-    if (!user) return error(401, 'You must be logged in to delete a post')
+  // [DELETE] /api/post/deletePost/:id
+  .delete(
+    '/deletePost/:id',
+    async ({ db, params: { id }, user, error }) => {
+      if (!user) return error(401, 'You must be logged in to delete a post')
 
-    const post = await db.post.delete({ where: { id } })
-    if (!post) return error(404, 'Post not found')
+      const post = await db.post.delete({ where: { id } })
+      if (!post) return error(404, 'Post not found')
 
-    if (post.image) await deleteFile(post.image)
+      if (post.image) await deleteFile(post.image)
 
-    return { message: 'Post deleted successfully' }
-  })
+      return { message: 'Post deleted successfully' }
+    },
+    { response: { 401: 'e', 404: 'e' } },
+  )

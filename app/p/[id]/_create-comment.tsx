@@ -8,17 +8,16 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader } from '@/components/ui/card'
 import * as f from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import { api } from '@/lib/api'
-import { revalidate } from '@/lib/revalidate'
-import { Input } from './ui/input'
+import { revalidate } from '@/server/actions'
 
-const schema = z.object({ content: z.string().min(1, 'Content is required') })
 export const CreateComment: React.FC<{ postId: string }> = ({ postId }) => {
   const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
   const handleSubmit = form.handleSubmit(async (values) => {
     await api.comment({ id: postId }).post(values)
     form.reset({ content: '' })
-    await revalidate('posts')
+    await revalidate({ tag: 'posts' })
   })
   const isPending = form.formState.isSubmitting
 
@@ -49,3 +48,5 @@ export const CreateComment: React.FC<{ postId: string }> = ({ postId }) => {
     </f.Form>
   )
 }
+
+const schema = z.object({ content: z.string().min(1, 'Content is required') })

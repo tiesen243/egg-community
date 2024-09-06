@@ -1,26 +1,17 @@
 'use client'
 
-import { ChevronLeft, HomeIcon, RssIcon, SearchIcon, UserIcon } from 'lucide-react'
+import * as icons from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
 
-import { CreatePost } from '@/components/tabs/create-post'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 import { useSession } from '@/lib/session'
+import { cn } from '@/lib/utils'
+import { CreatePost } from './create-post'
 
 const navs = [
-  {
-    label: HomeIcon,
-    href: '/',
-  },
-  {
-    label: RssIcon,
-    href: '/following',
-  },
-  {
-    label: SearchIcon,
-    href: '/search',
-  },
+  { label: icons.HomeIcon, href: '/' },
+  { label: icons.RssIcon, href: '/following' },
+  { label: icons.SearchIcon, href: '/search' },
 ]
 
 export const Tabs: React.FC<{ className?: string }> = ({ className }) => {
@@ -38,7 +29,7 @@ export const Tabs: React.FC<{ className?: string }> = ({ className }) => {
     >
       {isNotInNav && (
         <Button variant="ghost" className="flex-1" onClick={() => router.back()}>
-          <ChevronLeft />
+          <icons.ChevronLeft />
         </Button>
       )}
 
@@ -50,7 +41,7 @@ export const Tabs: React.FC<{ className?: string }> = ({ className }) => {
       <CreatePost />
 
       <Button variant="ghost" className="flex-1" onClick={() => router.push(`/u/${user.id}`)}>
-        <UserIcon className={pathName === `/u/${user.id}` ? '' : 'text-muted-foreground'} />
+        <icons.UserIcon className={pathName === `/u/${user.id}` ? '' : 'text-muted-foreground'} />
       </Button>
     </div>
   )

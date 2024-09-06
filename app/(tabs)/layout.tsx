@@ -1,5 +1,5 @@
-import { Header } from '@/components/header'
-import { Tabs } from '@/components/tabs'
+import { Header } from './_components/header'
+import { Tabs } from './_components/tabs'
 
 const TabLayot: React.FC<React.PropsWithChildren> = ({ children }) => (
   <>

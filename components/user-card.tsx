@@ -4,11 +4,7 @@ import Link from 'next/link'
 import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface Props {
-  user: {
-    id: string
-    name: string
-    image: string | null
-  }
+  user: { id: string; name: string; image: string | null }
 }
 export const UserCard: React.FC<Props> = ({ user }) => (
   <Link href={`/u/${user.id}`} passHref>
