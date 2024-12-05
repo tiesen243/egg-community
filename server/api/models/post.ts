@@ -49,7 +49,7 @@ const e = t.String()
 const postDetail = t.Object({
   id: t.String(),
   content: t.String(),
-  image: t.String(),
+  image: t.Union([t.String(), t.Null()]),
   createdAt: t.Date(),
   author,
   isLiked: t.Boolean(),

@@ -38,7 +38,6 @@ export const postRoute = createElysia({ name: 'Route.Post', prefix: '/post' })
   // [GET] /api/post/getOne/:id
   .get(
     '/getOne/:id',
-    // @ts-expect-error - query type is not defined
     async ({ db, params: { id }, query, error }) => {
       const post = await db.post.findUnique({
         where: { id },

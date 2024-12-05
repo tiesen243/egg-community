@@ -118,21 +118,21 @@ const Page: NextPage<Props> = async ({ params: { id } }) => {
 
 export default Page
 
-export const generateMetadata = async (
-  { params }: Props,
-  parent: ResolvingMetadata,
-): Promise<Metadata> => {
-  const { data, error } = await api.post.getOne({ id: params.id }).get({ query: {} })
-  if (!data || error) return { title: 'Error' }
-  const previousImages = (await parent).openGraph?.images ?? []
-
-  return seo({
-    title: data?.content.length > 20 ? data?.content.slice(0, 20) + '...' : data?.content,
-    url: `/p/${params.id}`,
-    description: data?.content,
-    images: [
-      `/api/og?title=${data.author.name}&desc=${data.content ?? ''}&image=${data.image ?? data.author.image ?? ''}`,
-      ...previousImages,
-    ],
-  })
-}
+// export const generateMetadata = async (
+//   { params }: Props,
+//   parent: ResolvingMetadata,
+// ): Promise<Metadata> => {
+//   const { data, error } = await api.post.getOne({ id: params.id }).get({ query: {} })
+//   if (!data || error) return { title: 'Error' }
+//   const previousImages = (await parent).openGraph?.images ?? []
+//
+//   return seo({
+//     title: data?.content.length > 20 ? data?.content.slice(0, 20) + '...' : data?.content,
+//     url: `/p/${params.id}`,
+//     description: data?.content,
+//     images: [
+//       `/api/og?title=${data.author.name}&desc=${data.content ?? ''}&image=${data.image ?? data.author.image ?? ''}`,
+//       ...previousImages,
+//     ],
+//   })
+// }
